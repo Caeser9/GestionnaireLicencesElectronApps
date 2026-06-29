@@ -1,44 +1,48 @@
 # Guide de déploiement pas à pas
 
 Domaine : **licenceskayapps.duckdns.org**  
-IP : **196.178.221.197**
+Repo GitHub : **https://github.com/Caeser9/GestionnaireLicencesElectronApps**
 
 ---
 
-## Étape 1 — Connexion au serveur
+## Quel serveur utiliser ?
 
-Depuis votre PC Windows (PowerShell ou Git Bash) :
+| | Machine locale (196.178.221.197) | VPS Cloud |
+|--|----------------------------------|-----------|
+| Disponibilité | Dépend de votre box/PC | 24/7 |
+| IP | Peut changer | Fixe en général |
+| Ports 80/443 | Redirection box requise | Ouverts directement |
+| **Recommandé pour production** | Non | **Oui** |
 
-```bash
-ssh utilisateur@196.178.221.197
-```
-
-Remplacez `utilisateur` par votre compte Linux (`root`, `ubuntu`, `debian`, etc.).
+**Conseil :** déployez sur le **VPS cloud**, puis mettez à jour DuckDNS avec l’**IP du VPS**.
 
 ---
 
-## Étape 2 — Transférer le projet sur le serveur
+## Étape 0 — Pointer DuckDNS vers le VPS cloud
 
-**Option A — Git (recommandé si repo GitHub/GitLab)**
+1. Notez l’**IP publique du VPS** (fournie par votre hébergeur)
+2. Sur [duckdns.org](https://www.duckdns.org), mettez `licenceskayapps` → **IP du VPS**
+3. Vérifiez : `ping licenceskayapps.duckdns.org`
+
+---
+
+## Étape 1 — Connexion au VPS cloud
 
 ```bash
-sudo mkdir -p /opt/license-platform
-sudo git clone VOTRE_URL_REPO /opt/license-platform
-cd /opt/license-platform
+ssh root@IP_DU_VPS
+# ou
+ssh ubuntu@IP_DU_VPS
 ```
 
-**Option B — Copie depuis votre PC (SCP)**
+(Remplacez par l’IP et l’utilisateur fournis par votre hébergeur : OVH, Hetzner, Contabo, DigitalOcean, etc.)
 
-Depuis votre PC, dans le dossier parent du projet :
+---
 
-```bash
-scp -r "Gestion Licences" utilisateur@196.178.221.197:/tmp/license-platform
-```
-
-Puis sur le serveur :
+## Étape 2 — Cloner le projet (GitHub)
 
 ```bash
-sudo mv /tmp/license-platform /opt/license-platform
+sudo apt update && sudo apt install -y git
+sudo git clone https://github.com/Caeser9/GestionnaireLicencesElectronApps.git /opt/license-platform
 cd /opt/license-platform
 ```
 
@@ -47,10 +51,10 @@ cd /opt/license-platform
 ## Étape 3 — Configurer le mot de passe admin
 
 ```bash
-sudo nano /opt/license-platform/backend/.env.production.example
+sudo nano backend/.env.production.example
 ```
 
-Modifiez au minimum :
+Modifiez :
 
 ```env
 SEED_ADMIN_EMAIL=votre@email.com
@@ -59,15 +63,12 @@ SEED_ADMIN_PASSWORD=VotreMotDePasseSecurise123!
 
 ---
 
-## Étape 4 — Lancer l'installation automatique
+## Étape 4 — Installation automatique
 
 ```bash
-cd /opt/license-platform
 sudo chmod +x deploy/install.sh
 sudo RUN_SEED=1 bash deploy/install.sh
 ```
-
-Le script installe : Node.js, MongoDB, Nginx, PM2, build l'app, configure HTTPS.
 
 ---
 
@@ -77,9 +78,20 @@ Le script installe : Node.js, MongoDB, Nginx, PM2, build l'app, configure HTTPS.
 curl https://licenceskayapps.duckdns.org/health
 ```
 
-Ouvrez dans le navigateur : **https://licenceskayapps.duckdns.org**
+Navigateur : **https://licenceskayapps.duckdns.org**
 
-Connectez-vous avec l'email et le mot de passe définis dans `.env`.
+---
+
+## Déploiement sur machine locale (alternative)
+
+Si vous préférez la machine à **196.178.221.197** :
+
+```bash
+ssh utilisateur@196.178.221.197
+# Puis mêmes étapes 2 à 5 (clone ou scp)
+```
+
+Assurez-vous d’ouvrir/rediriger les ports **80** et **443** sur votre box.
 
 ---
 
