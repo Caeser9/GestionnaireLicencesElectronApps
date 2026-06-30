@@ -102,6 +102,53 @@ export class ClientApiService {
       };
     }
 
+    // Licence déjà approuvée pour cette machine (admin a validé la demande)
+    const approvedRequest = await ActivationRequest.findOne({
+      machineIdHash,
+      product: product._id,
+      status: ActivationRequestStatus.APPROVED,
+    });
+
+    if (approvedRequest?.license) {
+      const license = await License.findById(approvedRequest.license).populate([
+        'client',
+        'product',
+        'licenseType',
+      ]);
+      if (
+        license &&
+        license.status === LicenseStatus.ACTIVE &&
+        license.machineIdHash === machineIdHash
+      ) {
+        await this.logActivation(license, data.machineId, data.appVersion, 'activate', req);
+        return {
+          status: 'activated',
+          ...licenseService.buildSignedResponse(license),
+        };
+      }
+    }
+
+    // Licence active déjà liée à cette machine (sans demande en cours)
+    const activeForMachine = await License.findOne({
+      product: product._id,
+      machineIdHash,
+      status: LicenseStatus.ACTIVE,
+    }).populate(['client', 'product', 'licenseType']);
+
+    if (activeForMachine && !isLicenseExpired(activeForMachine)) {
+      await this.logActivation(
+        activeForMachine,
+        data.machineId,
+        data.appVersion,
+        'activate',
+        req
+      );
+      return {
+        status: 'already_active',
+        ...licenseService.buildSignedResponse(activeForMachine),
+      };
+    }
+
     const activationRequest = await ActivationRequest.create({
       product: product._id,
       companyName: data.companyName,

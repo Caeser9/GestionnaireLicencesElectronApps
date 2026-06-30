@@ -87,10 +87,8 @@ if [[ ! -f backend/.env ]]; then
   warn "Changez SEED_ADMIN_PASSWORD dans backend/.env avant le seed!"
 fi
 
-# --- 8. Frontend .env ---
-if [[ ! -f frontend/.env ]]; then
-  cp frontend/.env.production.example frontend/.env
-fi
+# --- 8. Frontend (production) ---
+cp frontend/.env.production.example frontend/.env.production
 
 # --- 9. Clés RSA ---
 if [[ ! -f backend/keys/license-private.pem ]]; then

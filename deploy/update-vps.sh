@@ -25,6 +25,7 @@ pm2 logs license-api --lines 5 --nolog
 echo ">>> frontend build"
 cd ../frontend
 npm install
+cp .env.production.example .env.production 2>/dev/null || echo "VITE_API_URL=https://licenceskayapps.duckdns.org/api" > .env.production
 npm run build
 
 echo ""
