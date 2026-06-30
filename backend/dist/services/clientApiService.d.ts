@@ -14,7 +14,7 @@ export declare class ClientApiService {
         licenseToken: string;
         licenseKey: string;
         payload: import("../types").SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
         status: string;
@@ -33,7 +33,7 @@ export declare class ClientApiService {
         licenseToken: string;
         licenseKey: string;
         payload: import("../types").SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
         valid: boolean;
@@ -54,7 +54,7 @@ export declare class ClientApiService {
         licenseToken: string;
         licenseKey: string;
         payload: import("../types").SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
         status: string;
@@ -65,7 +65,7 @@ export declare class ClientApiService {
         licenseToken: string;
         licenseKey: string;
         payload: import("../types").SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
     }>;
@@ -78,7 +78,7 @@ export declare class ClientApiService {
         licenseToken: string;
         licenseKey: string;
         payload: import("../types").SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
         status: string;

@@ -144,7 +144,7 @@ class LicenseService {
             licenseToken: license.licenseToken,
             licenseKey: license.licenseKey,
             payload,
-            signature: license.signature,
+            signature: (0, crypto_1.signLicensePayload)(payload),
             checkIntervalDays: config_1.config.license.checkIntervalDays,
             publicKey: undefined, // clients should embed public key
         };

@@ -31,7 +31,7 @@ export declare class LicenseService {
         licenseToken: string;
         licenseKey: string;
         payload: SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
     };
@@ -47,7 +47,7 @@ export declare class LicenseService {
         licenseToken: string;
         licenseKey: string;
         payload: SignedLicensePayload;
-        signature: string | undefined;
+        signature: string;
         checkIntervalDays: number;
         publicKey: undefined;
     }>;

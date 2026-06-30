@@ -211,7 +211,7 @@ export class LicenseService {
       licenseToken: license.licenseToken,
       licenseKey: license.licenseKey,
       payload,
-      signature: license.signature,
+      signature: signLicensePayload(payload),
       checkIntervalDays: config.license.checkIntervalDays,
       publicKey: undefined, // clients should embed public key
     };
