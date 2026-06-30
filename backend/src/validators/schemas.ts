@@ -72,12 +72,17 @@ export const updateLicenseTypeSchema = createLicenseTypeSchema.partial().extend(
   isActive: z.boolean().optional(),
 });
 
+const optionalPositiveInt = z.preprocess(
+  (val) => (val === '' || val === null || val === undefined ? undefined : val),
+  z.coerce.number().int().min(1).optional()
+);
+
 export const createLicenseSchema = z.object({
   client: z.string(),
   product: z.string(),
   licenseType: z.string(),
-  maxUsers: z.number().int().min(1).optional(),
-  maxWorkstations: z.number().int().min(1).optional(),
+  maxUsers: optionalPositiveInt,
+  maxWorkstations: optionalPositiveInt,
   authorizedModules: z.array(z.string()).optional(),
   minVersion: z.string().optional(),
   maxVersion: z.string().optional(),
@@ -87,8 +92,8 @@ export const createLicenseSchema = z.object({
 
 export const updateLicenseSchema = z.object({
   status: z.nativeEnum(LicenseStatus).optional(),
-  maxUsers: z.number().int().min(1).optional(),
-  maxWorkstations: z.number().int().min(1).optional(),
+  maxUsers: optionalPositiveInt,
+  maxWorkstations: optionalPositiveInt,
   authorizedModules: z.array(z.string()).optional(),
   minVersion: z.string().optional(),
   maxVersion: z.string().optional(),
@@ -122,9 +127,9 @@ export const paginationSchema = z.object({
 
 export const approveActivationSchema = z.object({
   clientId: z.string().optional(),
-  licenseTypeId: z.string(),
-  maxUsers: z.number().int().min(1).optional(),
-  maxWorkstations: z.number().int().min(1).optional(),
+  licenseTypeId: z.string().min(1, 'Type de licence requis'),
+  maxUsers: optionalPositiveInt,
+  maxWorkstations: optionalPositiveInt,
   authorizedModules: z.array(z.string()).optional(),
   expiresAt: z.string().datetime().optional().nullable(),
   adminNotes: z.string().optional(),

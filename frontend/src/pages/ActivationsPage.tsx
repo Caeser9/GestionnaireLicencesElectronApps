@@ -2,16 +2,33 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import { licensesApi, catalogApi } from '../api/services';
-import { PageHeader, DataTable, Modal, StatusBadge, LoadingSpinner } from '../components/ui';
+import { PageHeader, DataTable, Modal, StatusBadge, LoadingSpinner, ErrorMessage } from '../components/ui';
 import { ActivationRequest, Product, LicenseType, ActivationRequestStatus } from '../types';
 import { formatDate } from '../utils';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
+import { getErrorMessage } from '../api/client';
+
+function buildApprovePayload(form: FormData): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    licenseTypeId: form.get('licenseTypeId'),
+  };
+  const maxUsers = form.get('maxUsers');
+  const maxWorkstations = form.get('maxWorkstations');
+  if (maxUsers && String(maxUsers).trim() !== '') {
+    payload.maxUsers = Number(maxUsers);
+  }
+  if (maxWorkstations && String(maxWorkstations).trim() !== '') {
+    payload.maxWorkstations = Number(maxWorkstations);
+  }
+  return payload;
+}
 
 export default function ActivationsPage() {
   const [selected, setSelected] = useState<ActivationRequest | null>(null);
   const [showApprove, setShowApprove] = useState(false);
   const [showReject, setShowReject] = useState(false);
+  const [approveError, setApproveError] = useState('');
   const queryClient = useQueryClient();
   const { hasRole } = useAuth();
 
@@ -34,6 +51,10 @@ export default function ActivationsPage() {
       queryClient.invalidateQueries({ queryKey: ['licenses'] });
       setShowApprove(false);
       setSelected(null);
+      setApproveError('');
+    },
+    onError: (error) => {
+      setApproveError(getErrorMessage(error));
     },
   });
 
@@ -115,19 +136,25 @@ export default function ActivationsPage() {
         <DataTable columns={columns} data={(data ?? []) as unknown as Record<string, unknown>[]} />
       )}
 
-      <Modal isOpen={showApprove} onClose={() => setShowApprove(false)} title="Approuver l'activation">
+      <Modal isOpen={showApprove} onClose={() => { setShowApprove(false); setApproveError(''); }} title="Approuver l'activation">
         {selected && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              setApproveError('');
               const form = new FormData(e.currentTarget);
+              if (!form.get('licenseTypeId')) {
+                setApproveError('Veuillez sélectionner un type de licence');
+                return;
+              }
               approveMutation.mutate({
                 id: selected._id,
-                data: Object.fromEntries(form.entries()),
+                data: buildApprovePayload(form),
               });
             }}
             className="space-y-4"
           >
+            {approveError && <ErrorMessage message={approveError} />}
             <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-1">
               <p><strong>Société:</strong> {selected.companyName}</p>
               <p><strong>Email:</strong> {selected.contactEmail}</p>
@@ -135,7 +162,8 @@ export default function ActivationsPage() {
             </div>
             <div>
               <label className="label">Type de licence *</label>
-              <select name="licenseTypeId" className="input" required>
+              <select name="licenseTypeId" className="input" required defaultValue="">
+                <option value="" disabled>Sélectionner...</option>
                 {licenseTypes?.map((lt) => (
                   <option key={lt._id} value={lt._id}>{lt.name}</option>
                 ))}
