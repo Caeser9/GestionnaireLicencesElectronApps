@@ -509,6 +509,19 @@ export declare const clientHeartbeatSchema: z.ZodObject<{
     appVersion: string;
     licenseToken: string;
 }>;
+export declare const clientActivationStatusSchema: z.ZodObject<{
+    requestId: z.ZodString;
+    machineId: z.ZodString;
+    appVersion: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    machineId: string;
+    requestId: string;
+    appVersion?: string | undefined;
+}, {
+    machineId: string;
+    requestId: string;
+    appVersion?: string | undefined;
+}>;
 export declare const mongoIdSchema: z.ZodObject<{
     id: z.ZodString;
 }, "strip", z.ZodTypeAny, {

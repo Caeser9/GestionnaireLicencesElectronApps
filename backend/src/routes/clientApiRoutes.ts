@@ -4,6 +4,7 @@ import { validateBody } from '../utils/validate';
 import {
   clientActivateSchema,
   clientVerifySchema,
+  clientActivationStatusSchema,
   clientTransferSchema,
   clientHeartbeatSchema,
 } from '../validators/schemas';
@@ -22,6 +23,7 @@ router.use(clientRateLimit);
 
 router.post('/activate', validateBody(clientActivateSchema), clientApiController.activate);
 router.post('/verify', validateBody(clientVerifySchema), clientApiController.verify);
+router.post('/activation/status', validateBody(clientActivationStatusSchema), clientApiController.activationStatus);
 router.get('/license/:token', clientApiController.getLicenseInfo);
 router.post('/transfer', validateBody(clientTransferSchema), clientApiController.transfer);
 router.get('/modules/:token', clientApiController.getModules);

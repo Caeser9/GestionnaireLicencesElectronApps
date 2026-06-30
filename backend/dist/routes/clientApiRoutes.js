@@ -51,6 +51,7 @@ const clientRateLimit = (0, express_rate_limit_1.default)({
 router.use(clientRateLimit);
 router.post('/activate', (0, validate_1.validateBody)(schemas_1.clientActivateSchema), clientApiController.activate);
 router.post('/verify', (0, validate_1.validateBody)(schemas_1.clientVerifySchema), clientApiController.verify);
+router.post('/activation/status', (0, validate_1.validateBody)(schemas_1.clientActivationStatusSchema), clientApiController.activationStatus);
 router.get('/license/:token', clientApiController.getLicenseInfo);
 router.post('/transfer', (0, validate_1.validateBody)(schemas_1.clientTransferSchema), clientApiController.transfer);
 router.get('/modules/:token', clientApiController.getModules);

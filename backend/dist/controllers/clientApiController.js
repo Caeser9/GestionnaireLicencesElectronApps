@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.verify = verify;
+exports.activationStatus = activationStatus;
 exports.getLicenseInfo = getLicenseInfo;
 exports.transfer = transfer;
 exports.getModules = getModules;
@@ -23,6 +24,15 @@ async function activate(req, res, next) {
 async function verify(req, res, next) {
     try {
         const result = await clientApiService_1.clientApiService.verifyLicense(req.body, req);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        next(error);
+    }
+}
+async function activationStatus(req, res, next) {
+    try {
+        const result = await clientApiService_1.clientApiService.getActivationStatus(req.body, req);
         res.json({ success: true, data: result });
     }
     catch (error) {

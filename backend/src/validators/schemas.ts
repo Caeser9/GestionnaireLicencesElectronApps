@@ -183,6 +183,12 @@ export const clientHeartbeatSchema = z.object({
   appVersion: z.string().min(1),
 });
 
+export const clientActivationStatusSchema = z.object({
+  requestId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'ID de demande invalide'),
+  machineId: z.string().min(8),
+  appVersion: z.string().min(1).optional(),
+});
+
 export const mongoIdSchema = z.object({
   id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'ID invalide'),
 });

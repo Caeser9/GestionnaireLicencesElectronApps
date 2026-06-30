@@ -38,6 +38,29 @@ export declare class ClientApiService {
         publicKey: undefined;
         valid: boolean;
     }>;
+    getActivationStatus(data: {
+        requestId: string;
+        machineId: string;
+        appVersion?: string;
+    }, req?: Request): Promise<{
+        status: string;
+        requestId: any;
+        reason?: undefined;
+    } | {
+        status: string;
+        requestId: any;
+        reason: any;
+    } | {
+        licenseToken: string;
+        licenseKey: string;
+        payload: import("../types").SignedLicensePayload;
+        signature: string | undefined;
+        checkIntervalDays: number;
+        publicKey: undefined;
+        status: string;
+        requestId: any;
+        reason?: undefined;
+    }>;
     getLicenseInfo(licenseToken: string): Promise<{
         licenseToken: string;
         licenseKey: string;

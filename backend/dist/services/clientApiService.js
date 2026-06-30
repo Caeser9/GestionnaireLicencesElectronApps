@@ -64,6 +64,41 @@ class ClientApiService {
                 message: 'Une demande d\'activation est en attente de validation',
             };
         }
+        // Licence déjà approuvée pour cette machine (admin a validé la demande)
+        const approvedRequest = await models_1.ActivationRequest.findOne({
+            machineIdHash,
+            product: product._id,
+            status: types_1.ActivationRequestStatus.APPROVED,
+        });
+        if (approvedRequest?.license) {
+            const license = await models_1.License.findById(approvedRequest.license).populate([
+                'client',
+                'product',
+                'licenseType',
+            ]);
+            if (license &&
+                license.status === types_1.LicenseStatus.ACTIVE &&
+                license.machineIdHash === machineIdHash) {
+                await this.logActivation(license, data.machineId, data.appVersion, 'activate', req);
+                return {
+                    status: 'activated',
+                    ...licenseService_1.licenseService.buildSignedResponse(license),
+                };
+            }
+        }
+        // Licence active déjà liée à cette machine (sans demande en cours)
+        const activeForMachine = await models_1.License.findOne({
+            product: product._id,
+            machineIdHash,
+            status: types_1.LicenseStatus.ACTIVE,
+        }).populate(['client', 'product', 'licenseType']);
+        if (activeForMachine && !(0, licenseService_1.isLicenseExpired)(activeForMachine)) {
+            await this.logActivation(activeForMachine, data.machineId, data.appVersion, 'activate', req);
+            return {
+                status: 'already_active',
+                ...licenseService_1.licenseService.buildSignedResponse(activeForMachine),
+            };
+        }
         const activationRequest = await models_1.ActivationRequest.create({
             product: product._id,
             companyName: data.companyName,
@@ -104,6 +139,41 @@ class ClientApiService {
         await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
         return {
             valid: true,
+            ...licenseService_1.licenseService.buildSignedResponse(license),
+        };
+    }
+    async getActivationStatus(data, req) {
+        const request = (0, AppError_1.assertFound)(await models_1.ActivationRequest.findById(data.requestId).populate('license'), 'Demande non trouvée');
+        const machineIdHash = (0, crypto_1.hashMachineId)(data.machineId);
+        if (request.machineIdHash !== machineIdHash) {
+            throw new AppError_1.AppError('Machine ID non correspondant pour cette demande', 403);
+        }
+        if (request.status === types_1.ActivationRequestStatus.PENDING) {
+            return { status: 'pending', requestId: request._id };
+        }
+        if (request.status === types_1.ActivationRequestStatus.REJECTED) {
+            return {
+                status: 'rejected',
+                requestId: request._id,
+                reason: request.rejectionReason || 'Demande rejetée par administrateur',
+            };
+        }
+        if (!request.license) {
+            throw new AppError_1.AppError('Licence introuvable pour cette demande approuvée', 404);
+        }
+        const license = (0, AppError_1.assertFound)(await models_1.License.findById(request.license).populate(['client', 'product', 'licenseType']), 'Licence non trouvée');
+        if (license.status !== types_1.LicenseStatus.ACTIVE) {
+            throw new AppError_1.AppError('Licence non active', 403);
+        }
+        if (license.machineIdHash !== machineIdHash) {
+            throw new AppError_1.AppError('Machine ID non correspondant pour cette licence', 403);
+        }
+        if (data.appVersion) {
+            await this.logActivation(license, data.machineId, data.appVersion, 'activate', req);
+        }
+        return {
+            status: 'activated',
+            requestId: request._id,
             ...licenseService_1.licenseService.buildSignedResponse(license),
         };
     }

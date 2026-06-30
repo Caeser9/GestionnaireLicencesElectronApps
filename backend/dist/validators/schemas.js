@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mongoIdSchema = exports.clientHeartbeatSchema = exports.clientUpdateCheckSchema = exports.clientTransferSchema = exports.clientVerifySchema = exports.clientActivateSchema = exports.rejectActivationSchema = exports.paginationSchema = exports.updateAppVersionSchema = exports.createAppVersionSchema = exports.updateLicenseSchema = exports.createLicenseSchema = exports.approveActivationSchema = exports.updateLicenseTypeSchema = exports.createLicenseTypeSchema = exports.updateModuleSchema = exports.createModuleSchema = exports.updateProductSchema = exports.createProductSchema = exports.updateClientSchema = exports.createClientSchema = exports.updateUserSchema = exports.createUserSchema = exports.loginSchema = void 0;
+exports.mongoIdSchema = exports.clientActivationStatusSchema = exports.clientHeartbeatSchema = exports.clientUpdateCheckSchema = exports.clientTransferSchema = exports.clientVerifySchema = exports.clientActivateSchema = exports.rejectActivationSchema = exports.paginationSchema = exports.updateAppVersionSchema = exports.createAppVersionSchema = exports.updateLicenseSchema = exports.createLicenseSchema = exports.approveActivationSchema = exports.updateLicenseTypeSchema = exports.createLicenseTypeSchema = exports.updateModuleSchema = exports.createModuleSchema = exports.updateProductSchema = exports.createProductSchema = exports.updateClientSchema = exports.createClientSchema = exports.updateUserSchema = exports.createUserSchema = exports.loginSchema = void 0;
 const zod_1 = require("zod");
 const types_1 = require("../types");
 exports.loginSchema = zod_1.z.object({
@@ -158,6 +158,11 @@ exports.clientHeartbeatSchema = zod_1.z.object({
     licenseToken: zod_1.z.string().min(1),
     machineId: zod_1.z.string().min(8),
     appVersion: zod_1.z.string().min(1),
+});
+exports.clientActivationStatusSchema = zod_1.z.object({
+    requestId: zod_1.z.string().regex(/^[0-9a-fA-F]{24}$/, 'ID de demande invalide'),
+    machineId: zod_1.z.string().min(8),
+    appVersion: zod_1.z.string().min(1).optional(),
 });
 exports.mongoIdSchema = zod_1.z.object({
     id: zod_1.z.string().regex(/^[0-9a-fA-F]{24}$/, 'ID invalide'),

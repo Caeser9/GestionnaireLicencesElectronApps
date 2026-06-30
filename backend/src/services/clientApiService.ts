@@ -208,6 +208,60 @@ export class ClientApiService {
     };
   }
 
+  async getActivationStatus(
+    data: { requestId: string; machineId: string; appVersion?: string },
+    req?: Request
+  ) {
+    const request = assertFound(
+      await ActivationRequest.findById(data.requestId).populate('license'),
+      'Demande non trouvée'
+    );
+
+    const machineIdHash = hashMachineId(data.machineId);
+    if (request.machineIdHash !== machineIdHash) {
+      throw new AppError('Machine ID non correspondant pour cette demande', 403);
+    }
+
+    if (request.status === ActivationRequestStatus.PENDING) {
+      return { status: 'pending', requestId: request._id };
+    }
+
+    if (request.status === ActivationRequestStatus.REJECTED) {
+      return {
+        status: 'rejected',
+        requestId: request._id,
+        reason: request.rejectionReason || 'Demande rejetée par administrateur',
+      };
+    }
+
+    if (!request.license) {
+      throw new AppError('Licence introuvable pour cette demande approuvée', 404);
+    }
+
+    const license = assertFound(
+      await License.findById(request.license).populate(['client', 'product', 'licenseType']),
+      'Licence non trouvée'
+    );
+
+    if (license.status !== LicenseStatus.ACTIVE) {
+      throw new AppError('Licence non active', 403);
+    }
+
+    if (license.machineIdHash !== machineIdHash) {
+      throw new AppError('Machine ID non correspondant pour cette licence', 403);
+    }
+
+    if (data.appVersion) {
+      await this.logActivation(license, data.machineId, data.appVersion, 'activate', req);
+    }
+
+    return {
+      status: 'activated',
+      requestId: request._id,
+      ...licenseService.buildSignedResponse(license),
+    };
+  }
+
   async getLicenseInfo(licenseToken: string) {
     const license = assertFound(
       await License.findOne({ licenseToken })

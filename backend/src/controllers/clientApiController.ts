@@ -21,6 +21,15 @@ export async function verify(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function activationStatus(req: Request, res: Response, next: NextFunction) {
+  try {
+    const result = await clientApiService.getActivationStatus(req.body, req);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getLicenseInfo(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await clientApiService.getLicenseInfo(getParam(req.params, 'token'));
