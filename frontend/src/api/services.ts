@@ -31,7 +31,17 @@ export const licensesApi = {
   transfer: (id: string, newMachineId: string) => api.post(`/licenses/${id}/transfer`, { newMachineId }),
   logs: (id: string) => api.get(`/licenses/${id}/logs`),
   activations: (params?: Record<string, unknown>) => api.get('/licenses/activations', { params }),
-  approveActivation: (id: string, data: Record<string, unknown>) => api.post(`/licenses/activations/${id}/approve`, data),
+  approveActivation: (id: string, data: {
+    licenseTypeId: string;
+    maxUsers?: number;
+    maxWorkstations?: number;
+    clientId?: string;
+  }) => api.post(`/licenses/activations/${id}/approve`, {
+    licenseTypeId: data.licenseTypeId,
+    ...(data.maxUsers != null ? { maxUsers: Number(data.maxUsers) } : {}),
+    ...(data.maxWorkstations != null ? { maxWorkstations: Number(data.maxWorkstations) } : {}),
+    ...(data.clientId ? { clientId: data.clientId } : {}),
+  }),
   rejectActivation: (id: string, reason: string) => api.post(`/licenses/activations/${id}/reject`, { reason }),
 };
 
