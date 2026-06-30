@@ -184,17 +184,35 @@ export class ClientApiService {
     }
 
     if (license.status === LicenseStatus.SUSPENDED) {
-      throw new AppError('Licence suspendue', 403);
+      await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
+      return {
+        valid: false,
+        status: LicenseStatus.SUSPENDED,
+        message: 'Licence suspendue',
+        ...licenseService.buildSignedResponse(license),
+      };
     }
 
     if (isLicenseExpired(license)) {
       license.status = LicenseStatus.EXPIRED;
       await license.save();
-      throw new AppError('Licence expirée', 403);
+      await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
+      return {
+        valid: false,
+        status: LicenseStatus.EXPIRED,
+        message: 'Licence expiree',
+        ...licenseService.buildSignedResponse(license),
+      };
     }
 
     if (license.status !== LicenseStatus.ACTIVE) {
-      throw new AppError('Licence non active', 403);
+      await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
+      return {
+        valid: false,
+        status: license.status,
+        message: 'Licence non active',
+        ...licenseService.buildSignedResponse(license),
+      };
     }
 
     license.lastVerifiedAt = new Date();

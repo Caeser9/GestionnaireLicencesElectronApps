@@ -124,15 +124,33 @@ class ClientApiService {
             throw new AppError_1.AppError('Machine ID non correspondant', 403);
         }
         if (license.status === types_1.LicenseStatus.SUSPENDED) {
-            throw new AppError_1.AppError('Licence suspendue', 403);
+            await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
+            return {
+                valid: false,
+                status: types_1.LicenseStatus.SUSPENDED,
+                message: 'Licence suspendue',
+                ...licenseService_1.licenseService.buildSignedResponse(license),
+            };
         }
         if ((0, licenseService_1.isLicenseExpired)(license)) {
             license.status = types_1.LicenseStatus.EXPIRED;
             await license.save();
-            throw new AppError_1.AppError('Licence expirée', 403);
+            await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
+            return {
+                valid: false,
+                status: types_1.LicenseStatus.EXPIRED,
+                message: 'Licence expiree',
+                ...licenseService_1.licenseService.buildSignedResponse(license),
+            };
         }
         if (license.status !== types_1.LicenseStatus.ACTIVE) {
-            throw new AppError_1.AppError('Licence non active', 403);
+            await this.logActivation(license, data.machineId, data.appVersion, 'verify', req);
+            return {
+                valid: false,
+                status: license.status,
+                message: 'Licence non active',
+                ...licenseService_1.licenseService.buildSignedResponse(license),
+            };
         }
         license.lastVerifiedAt = new Date();
         await license.save();

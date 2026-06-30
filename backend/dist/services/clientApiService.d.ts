@@ -37,6 +37,16 @@ export declare class ClientApiService {
         checkIntervalDays: number;
         publicKey: undefined;
         valid: boolean;
+        status: any;
+        message: string;
+    } | {
+        licenseToken: string;
+        licenseKey: string;
+        payload: import("../types").SignedLicensePayload;
+        signature: string;
+        checkIntervalDays: number;
+        publicKey: undefined;
+        valid: boolean;
     }>;
     getActivationStatus(data: {
         requestId: string;
