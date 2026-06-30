@@ -113,6 +113,10 @@ export class LicenseService {
 
     Object.assign(license, data);
 
+    if (license.status === LicenseStatus.ACTIVE && license.expiresAt && license.expiresAt < new Date()) {
+      license.expiresAt = undefined;
+    }
+
     if (license.status === LicenseStatus.ACTIVE && license.machineId) {
       await this.regenerateSignature(license);
     }

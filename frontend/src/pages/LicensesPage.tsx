@@ -37,6 +37,13 @@ function toDateInput(value?: string): string {
   return value.slice(0, 10);
 }
 
+function isPastDateInput(value: string): boolean {
+  if (!value) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(`${value}T00:00:00`) < today;
+}
+
 export default function LicensesPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -372,7 +379,16 @@ export default function LicensesPage() {
                   value={editForm.status}
                   onChange={(e) =>
                     setEditForm((current) =>
-                      current ? { ...current, status: e.target.value as LicenseStatus } : current
+                      current
+                        ? {
+                            ...current,
+                            status: e.target.value as LicenseStatus,
+                            expiresAt:
+                              e.target.value === LicenseStatus.ACTIVE && isPastDateInput(current.expiresAt)
+                                ? ''
+                                : current.expiresAt,
+                          }
+                        : current
                     )
                   }
                   required
