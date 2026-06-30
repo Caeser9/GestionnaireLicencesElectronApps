@@ -190,6 +190,7 @@ export class LicenseService {
       machineId: populated.machineId || '',
       activatedAt: populated.activatedAt?.toISOString() || '',
       expiresAt: populated.expiresAt?.toISOString(),
+      adminNotes: populated.adminNotes,
       issuedAt: new Date().toISOString(),
     };
 
@@ -219,6 +220,7 @@ export class LicenseService {
       machineId: license.machineId || '',
       activatedAt: license.activatedAt?.toISOString() || '',
       expiresAt: license.expiresAt?.toISOString(),
+      adminNotes: license.adminNotes,
       issuedAt: new Date().toISOString(),
     };
 

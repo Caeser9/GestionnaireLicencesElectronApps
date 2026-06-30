@@ -124,6 +124,7 @@ class LicenseService {
             machineId: populated.machineId || '',
             activatedAt: populated.activatedAt?.toISOString() || '',
             expiresAt: populated.expiresAt?.toISOString(),
+            adminNotes: populated.adminNotes,
             issuedAt: new Date().toISOString(),
         };
         populated.signature = (0, crypto_1.signLicensePayload)(payload);
@@ -150,6 +151,7 @@ class LicenseService {
             machineId: license.machineId || '',
             activatedAt: license.activatedAt?.toISOString() || '',
             expiresAt: license.expiresAt?.toISOString(),
+            adminNotes: license.adminNotes,
             issuedAt: new Date().toISOString(),
         };
         return {
