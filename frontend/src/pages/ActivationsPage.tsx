@@ -37,7 +37,7 @@ export default function ActivationsPage() {
     queryFn: () => licensesApi.activations().then((r) => r.data.data as ActivationRequest[]),
   });
 
-  const { data: licenseTypes } = useQuery({
+  const { data: licenseTypes, isLoading: loadingTypes, isError: typesError } = useQuery({
     queryKey: ['license-types-list'],
     queryFn: () => catalogApi.licenseTypes.list().then((r) => r.data.data.items as LicenseType[]),
     enabled: showApprove,
@@ -162,12 +162,20 @@ export default function ActivationsPage() {
             </div>
             <div>
               <label className="label">Type de licence *</label>
+              {loadingTypes ? (
+                <p className="text-sm text-gray-500">Chargement...</p>
+              ) : typesError || !licenseTypes?.length ? (
+                <p className="text-sm text-red-600">
+                  Aucun type de licence. Exécutez <code className="bg-gray-100 px-1">npm run seed</code> sur le serveur.
+                </p>
+              ) : (
               <select name="licenseTypeId" className="input" required defaultValue="">
                 <option value="" disabled>Sélectionner...</option>
-                {licenseTypes?.map((lt) => (
+                {licenseTypes.map((lt) => (
                   <option key={lt._id} value={lt._id}>{lt.name}</option>
                 ))}
               </select>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>

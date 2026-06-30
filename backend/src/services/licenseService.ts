@@ -237,8 +237,18 @@ export class LicenseService {
     );
 
     if (activationRequest.status !== ActivationRequestStatus.PENDING) {
-      throw new AppError('Cette demande a déjà été traitée', 400);
+      throw new AppError(
+        `Cette demande a déjà été traitée (statut: ${activationRequest.status}).`,
+        400
+      );
     }
+
+    const productId =
+      typeof activationRequest.product === 'object' &&
+      activationRequest.product !== null &&
+      '_id' in activationRequest.product
+        ? activationRequest.product._id.toString()
+        : String(activationRequest.product);
 
     let client;
     if (data.clientId) {
@@ -256,7 +266,7 @@ export class LicenseService {
     const license = await this.createLicense(
       {
         client: client._id.toString(),
-        product: activationRequest.product._id.toString(),
+        product: productId,
         licenseType: data.licenseTypeId,
         maxUsers: data.maxUsers,
         maxWorkstations: data.maxWorkstations,

@@ -73,9 +73,26 @@ export const updateLicenseTypeSchema = createLicenseTypeSchema.partial().extend(
 });
 
 const optionalPositiveInt = z.preprocess(
-  (val) => (val === '' || val === null || val === undefined ? undefined : val),
-  z.coerce.number().int().min(1).optional()
+  (val) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    const n = Number(val);
+    if (Number.isNaN(n) || n < 1) return undefined;
+    return Math.floor(n);
+  },
+  z.number().int().min(1).optional()
 );
+
+const mongoObjectId = z.string().regex(/^[0-9a-fA-F]{24}$/, 'ID MongoDB invalide');
+
+export const approveActivationSchema = z.object({
+  clientId: mongoObjectId.optional(),
+  licenseTypeId: mongoObjectId,
+  maxUsers: optionalPositiveInt,
+  maxWorkstations: optionalPositiveInt,
+  authorizedModules: z.array(z.string()).optional(),
+  expiresAt: z.union([z.string().datetime(), z.null(), z.literal('')]).optional().transform((v) => v || undefined),
+  adminNotes: z.string().optional(),
+});
 
 export const createLicenseSchema = z.object({
   client: z.string(),
@@ -123,16 +140,6 @@ export const paginationSchema = z.object({
   search: z.string().optional(),
   sortBy: z.string().optional(),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
-});
-
-export const approveActivationSchema = z.object({
-  clientId: z.string().optional(),
-  licenseTypeId: z.string().min(1, 'Type de licence requis'),
-  maxUsers: optionalPositiveInt,
-  maxWorkstations: optionalPositiveInt,
-  authorizedModules: z.array(z.string()).optional(),
-  expiresAt: z.string().datetime().optional().nullable(),
-  adminNotes: z.string().optional(),
 });
 
 export const rejectActivationSchema = z.object({

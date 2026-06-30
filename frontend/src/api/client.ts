@@ -31,7 +31,8 @@ api.interceptors.response.use(
 
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    return error.response?.data?.error || error.message;
+    const data = error.response?.data as { error?: string; message?: string } | undefined;
+    return data?.error || data?.message || error.message;
   }
   return 'Une erreur est survenue';
 }
