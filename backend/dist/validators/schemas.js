@@ -94,6 +94,7 @@ exports.createLicenseSchema = zod_1.z.object({
     adminNotes: zod_1.z.string().optional(),
 });
 exports.updateLicenseSchema = zod_1.z.object({
+    licenseType: mongoObjectId.optional(),
     status: zod_1.z.nativeEnum(types_1.LicenseStatus).optional(),
     maxUsers: optionalPositiveInt,
     maxWorkstations: optionalPositiveInt,

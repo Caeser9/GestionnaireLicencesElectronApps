@@ -45,6 +45,18 @@ class LicenseService {
     }
     async updateLicense(id, data, updater, req) {
         const license = (0, AppError_1.assertFound)(await models_1.License.findById(id), 'Licence non trouvée');
+        if (data.licenseType) {
+            const licenseType = (0, AppError_1.assertFound)(await models_1.LicenseType.findById(data.licenseType), 'Type de licence non trouvé');
+            data.licenseType = licenseType._id;
+            if (data.maxUsers === undefined)
+                data.maxUsers = licenseType.defaultMaxUsers;
+            if (data.maxWorkstations === undefined) {
+                data.maxWorkstations = licenseType.defaultMaxWorkstations;
+            }
+            if (data.authorizedModules === undefined) {
+                data.authorizedModules = licenseType.defaultModules;
+            }
+        }
         if (data.expiresAt !== undefined) {
             license.expiresAt = data.expiresAt ? new Date(data.expiresAt) : undefined;
             delete data.expiresAt;

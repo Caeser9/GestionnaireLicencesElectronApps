@@ -91,6 +91,21 @@ export class LicenseService {
   ) {
     const license = assertFound(await License.findById(id), 'Licence non trouvée');
 
+    if (data.licenseType) {
+      const licenseType = assertFound(
+        await LicenseType.findById(data.licenseType),
+        'Type de licence non trouvé'
+      );
+      data.licenseType = licenseType._id;
+      if (data.maxUsers === undefined) data.maxUsers = licenseType.defaultMaxUsers;
+      if (data.maxWorkstations === undefined) {
+        data.maxWorkstations = licenseType.defaultMaxWorkstations;
+      }
+      if (data.authorizedModules === undefined) {
+        data.authorizedModules = licenseType.defaultModules;
+      }
+    }
+
     if (data.expiresAt !== undefined) {
       license.expiresAt = data.expiresAt ? new Date(data.expiresAt as string) : undefined;
       delete data.expiresAt;

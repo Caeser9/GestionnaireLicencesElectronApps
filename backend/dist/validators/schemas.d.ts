@@ -309,6 +309,7 @@ export declare const createLicenseSchema: z.ZodObject<{
     maxVersion?: string | undefined;
 }>;
 export declare const updateLicenseSchema: z.ZodObject<{
+    licenseType: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodNativeEnum<typeof LicenseStatus>>;
     maxUsers: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     maxWorkstations: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
@@ -324,6 +325,7 @@ export declare const updateLicenseSchema: z.ZodObject<{
     authorizedModules?: string[] | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
+    licenseType?: string | undefined;
     minVersion?: string | undefined;
     maxVersion?: string | undefined;
 }, {
@@ -333,6 +335,7 @@ export declare const updateLicenseSchema: z.ZodObject<{
     authorizedModules?: string[] | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
+    licenseType?: string | undefined;
     minVersion?: string | undefined;
     maxVersion?: string | undefined;
 }>;

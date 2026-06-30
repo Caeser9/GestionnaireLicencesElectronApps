@@ -108,6 +108,7 @@ export const createLicenseSchema = z.object({
 });
 
 export const updateLicenseSchema = z.object({
+  licenseType: mongoObjectId.optional(),
   status: z.nativeEnum(LicenseStatus).optional(),
   maxUsers: optionalPositiveInt,
   maxWorkstations: optionalPositiveInt,
