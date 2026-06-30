@@ -9,10 +9,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import { getErrorMessage } from '../api/client';
 
-function buildApprovePayload(form: FormData): Record<string, unknown> {
-  const payload: Record<string, unknown> = {
-    licenseTypeId: form.get('licenseTypeId'),
-  };
+interface ApproveActivationPayload {
+  licenseTypeId: string;
+  maxUsers?: number;
+  maxWorkstations?: number;
+}
+
+function buildApprovePayload(form: FormData): ApproveActivationPayload {
+  const licenseTypeId = String(form.get('licenseTypeId') || '');
+  const payload: ApproveActivationPayload = { licenseTypeId };
   const maxUsers = form.get('maxUsers');
   const maxWorkstations = form.get('maxWorkstations');
   if (maxUsers && String(maxUsers).trim() !== '') {
@@ -44,7 +49,7 @@ export default function ActivationsPage() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
+    mutationFn: ({ id, data }: { id: string; data: ApproveActivationPayload }) =>
       licensesApi.approveActivation(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activations'] });
