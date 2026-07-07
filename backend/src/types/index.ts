@@ -61,6 +61,7 @@ export interface SignedLicensePayload {
   maxUsers: number;
   maxWorkstations: number;
   authorizedModules: string[];
+  dashboardMode?: 'pro' | 'simple';
   minVersion?: string;
   maxVersion?: string;
   machineId: string;

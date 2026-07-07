@@ -13,6 +13,7 @@ export interface ILicense extends Document {
   maxUsers: number;
   maxWorkstations: number;
   authorizedModules: string[];
+  dashboardMode?: 'pro' | 'simple';
   minVersion?: string;
   maxVersion?: string;
   machineId?: string;
@@ -42,6 +43,7 @@ const licenseSchema = new Schema<ILicense>(
     maxUsers: { type: Number, required: true, min: 1 },
     maxWorkstations: { type: Number, required: true, min: 1 },
     authorizedModules: [{ type: String }],
+    dashboardMode: { type: String, enum: ['pro', 'simple'] },
     minVersion: { type: String },
     maxVersion: { type: String },
     machineId: { type: String },

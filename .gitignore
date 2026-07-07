@@ -1,1 +1,34 @@
 node_modules/
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Build outputs and caches
+dist/
+frontend/dist/
+backend/dist/
+*.tsbuildinfo
+.vite/
+.turbo/
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime/generated license keys
+backend/keys/*.pem
+!backend/keys/.gitkeep
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

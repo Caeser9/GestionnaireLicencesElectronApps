@@ -90,6 +90,7 @@ export const approveActivationSchema = z.object({
   maxUsers: optionalPositiveInt,
   maxWorkstations: optionalPositiveInt,
   authorizedModules: z.array(z.string()).optional(),
+  dashboardMode: z.enum(['pro', 'simple']).optional(),
   expiresAt: z.union([z.string().datetime(), z.null(), z.literal('')]).optional().transform((v) => v || undefined),
   adminNotes: z.string().optional(),
 });
@@ -101,6 +102,7 @@ export const createLicenseSchema = z.object({
   maxUsers: optionalPositiveInt,
   maxWorkstations: optionalPositiveInt,
   authorizedModules: z.array(z.string()).optional(),
+  dashboardMode: z.enum(['pro', 'simple']).optional(),
   minVersion: z.string().optional(),
   maxVersion: z.string().optional(),
   expiresAt: z.string().datetime().optional().nullable(),
@@ -113,6 +115,7 @@ export const updateLicenseSchema = z.object({
   maxUsers: optionalPositiveInt,
   maxWorkstations: optionalPositiveInt,
   authorizedModules: z.array(z.string()).optional(),
+  dashboardMode: z.enum(['pro', 'simple']).optional(),
   minVersion: z.string().optional(),
   maxVersion: z.string().optional(),
   expiresAt: z.string().datetime().optional().nullable(),

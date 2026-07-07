@@ -330,6 +330,13 @@ export default function LicensesPage() {
             </div>
           </div>
           <div>
+            <label className="label">Type de tableau de bord</label>
+            <select name="dashboardMode" className="input" defaultValue="pro">
+              <option value="pro">Pro / analytique</option>
+              <option value="simple">Simple / raccourcis</option>
+            </select>
+          </div>
+          <div>
             <label className="label">Notes admin</label>
             <textarea name="adminNotes" className="input" rows={2} />
           </div>

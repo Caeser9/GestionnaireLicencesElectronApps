@@ -13,6 +13,7 @@ interface ApproveActivationPayload {
   licenseTypeId: string;
   maxUsers?: number;
   maxWorkstations?: number;
+  dashboardMode?: 'pro' | 'simple';
 }
 
 function buildApprovePayload(form: FormData): ApproveActivationPayload {
@@ -25,6 +26,10 @@ function buildApprovePayload(form: FormData): ApproveActivationPayload {
   }
   if (maxWorkstations && String(maxWorkstations).trim() !== '') {
     payload.maxWorkstations = Number(maxWorkstations);
+  }
+  const dashboardMode = form.get('dashboardMode');
+  if (dashboardMode && String(dashboardMode).trim() !== '') {
+    payload.dashboardMode = String(dashboardMode) as 'pro' | 'simple';
   }
   return payload;
 }
@@ -191,6 +196,13 @@ export default function ActivationsPage() {
                 <label className="label">Max postes</label>
                 <input name="maxWorkstations" type="number" min="1" defaultValue="1" className="input" />
               </div>
+            </div>
+            <div>
+              <label className="label">Type de tableau de bord</label>
+              <select name="dashboardMode" className="input" defaultValue="pro">
+                <option value="pro">Pro / analytique</option>
+                <option value="simple">Simple / raccourcis</option>
+              </select>
             </div>
             <div className="flex justify-end gap-3">
               <button type="button" className="btn-secondary" onClick={() => setShowApprove(false)}>Annuler</button>
