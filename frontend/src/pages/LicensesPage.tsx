@@ -22,6 +22,7 @@ interface EditFormState {
   status: LicenseStatus;
   maxUsers: string;
   maxWorkstations: string;
+  dashboardMode: 'pro' | 'simple';
   expiresAt: string;
   adminNotes: string;
   authorizedModules: string[];
@@ -121,6 +122,7 @@ export default function LicensesPage() {
       status: license.status,
       maxUsers: String(license.maxUsers ?? ''),
       maxWorkstations: String(license.maxWorkstations ?? ''),
+      dashboardMode: license.dashboardMode ?? 'pro',
       expiresAt: toDateInput(license.expiresAt),
       adminNotes: license.adminNotes ?? '',
       authorizedModules: license.authorizedModules ?? [],
@@ -165,6 +167,7 @@ export default function LicensesPage() {
         status: editForm.status,
         maxUsers: Number(editForm.maxUsers),
         maxWorkstations: Number(editForm.maxWorkstations),
+        dashboardMode: editForm.dashboardMode,
         authorizedModules: editForm.authorizedModules,
         expiresAt: editForm.expiresAt ? new Date(editForm.expiresAt).toISOString() : null,
         adminNotes: editForm.adminNotes,
@@ -453,6 +456,22 @@ export default function LicensesPage() {
                   }
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="label">Type de tableau de bord</label>
+              <select
+                className="input"
+                value={editForm.dashboardMode}
+                onChange={(e) =>
+                  setEditForm((current) =>
+                    current ? { ...current, dashboardMode: e.target.value as 'pro' | 'simple' } : current
+                  )
+                }
+              >
+                <option value="pro">Pro / analytique</option>
+                <option value="simple">Simple / raccourcis</option>
+              </select>
             </div>
 
             <div>
