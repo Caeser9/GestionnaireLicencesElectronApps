@@ -40,7 +40,10 @@ export default function ActivationsPage() {
   const [showReject, setShowReject] = useState(false);
   const [approveError, setApproveError] = useState('');
   const queryClient = useQueryClient();
-  const { hasRole } = useAuth();
+  const { user } = useAuth();
+  const canManageActivations = user?.role === UserRole.MODERATOR
+    || user?.role === UserRole.ADMIN
+    || user?.role === UserRole.SUPER_ADMIN;
 
   const { data, isLoading } = useQuery({
     queryKey: ['activations'],
@@ -112,7 +115,7 @@ export default function ActivationsPage() {
       label: 'Actions',
       render: (_: unknown, row: Record<string, unknown>) => {
         const req = row as unknown as ActivationRequest;
-        if (req.status !== ActivationRequestStatus.PENDING || !hasRole(UserRole.ADMIN)) return null;
+        if (req.status !== ActivationRequestStatus.PENDING || !canManageActivations) return null;
         return (
           <div className="flex gap-2">
             <button
