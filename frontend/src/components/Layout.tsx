@@ -12,7 +12,9 @@ import {
   LogOut,
   Shield,
   Bell,
+  Menu,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole, ROLE_LABELS } from '../types';
 import { cn } from '../utils';
@@ -32,10 +34,21 @@ const navigation = [
 
 export default function Layout() {
   const { user, logout, hasRole } = useAuth();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-64 bg-gray-900 text-white flex flex-col">
+    <div className="min-h-screen flex bg-gray-50">
+      {mobileNavOpen && (
+        <button
+          aria-label="Fermer le menu"
+          className="fixed inset-0 z-40 bg-gray-950/50 lg:hidden"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+      <aside className={cn(
+        'fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-gray-900 text-white transition-transform duration-200 lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0',
+        mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+      )}>
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
             <Activity className="h-8 w-8 text-primary-400" />
@@ -64,6 +77,7 @@ export default function Layout() {
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   )
                 }
+                onClick={() => setMobileNavOpen(false)}
               >
                 <item.icon className="h-5 w-5" />
                 {item.name}
@@ -91,8 +105,18 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
-        <div className="p-8 max-w-7xl mx-auto">
+      <main className="min-w-0 flex-1 overflow-x-hidden">
+        <div className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:hidden">
+          <button
+            aria-label="Ouvrir le menu"
+            className="rounded-lg p-2 text-gray-700 hover:bg-gray-100"
+            onClick={() => setMobileNavOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <span className="font-semibold text-gray-900">License Platform</span>
+        </div>
+        <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
           <Outlet />
         </div>
       </main>

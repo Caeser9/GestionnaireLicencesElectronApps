@@ -102,7 +102,7 @@ export default function ClientsPage() {
         title={editing ? 'Modifier le client' : 'Nouveau client'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="col-span-2">
               <label className="label">Nom de la société *</label>
               <input name="companyName" className="input" defaultValue={editing?.companyName} required />
@@ -132,7 +132,7 @@ export default function ClientsPage() {
               <textarea name="notes" className="input" rows={3} defaultValue={editing?.notes} />
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
             <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Annuler</button>
             <button type="submit" className="btn-primary" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}

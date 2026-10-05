@@ -28,7 +28,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-primary-900 to-gray-900">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md px-1">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary-600 mb-4">
             <Shield className="h-8 w-8 text-white" />
@@ -37,7 +37,7 @@ export default function LoginPage() {
           <p className="text-gray-400 mt-1">Administration des licences</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl bg-white p-5 shadow-xl sm:p-8">
           {error && <ErrorMessage message={error} />}
 
           <div>

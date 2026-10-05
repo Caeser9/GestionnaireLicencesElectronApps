@@ -9,12 +9,12 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div className="flex items-start justify-between mb-8">
+    <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">{title}</h1>
         {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
       </div>
-      {actions && <div className="flex items-center gap-3">{actions}</div>}
+      {actions && <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">{actions}</div>}
     </div>
   );
 }
@@ -74,9 +74,9 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   const sizes = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl' };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto sm:items-center sm:p-4">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className={cn('relative bg-white rounded-xl shadow-xl w-full mx-4 p-6', sizes[size])}>
+      <div className={cn('relative max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl sm:mx-4 sm:rounded-xl sm:p-6', sizes[size])}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{title}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
@@ -113,7 +113,21 @@ export function DataTable({ columns, data, loading, onRowClick }: DataTableProps
 
   return (
     <div className="card overflow-hidden p-0">
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-gray-200 md:hidden">
+        {data.map((row, i) => (
+          <article key={i} className="space-y-3 p-4" onClick={() => onRowClick?.(row)}>
+            {columns.map((col) => (
+              <div key={col.key} className="grid grid-cols-[minmax(5.5rem,0.7fr)_minmax(0,1.3fr)] gap-3 text-sm">
+                <span className="font-medium text-gray-500">{col.label}</span>
+                <span className="min-w-0 break-words text-gray-900">
+                  {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '-')}
+                </span>
+              </div>
+            ))}
+          </article>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">

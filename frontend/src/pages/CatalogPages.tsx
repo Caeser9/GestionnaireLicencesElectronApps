@@ -103,7 +103,7 @@ function CatalogPage({
               )}
             </div>
           ))}
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Annuler</button>
             <button type="submit" className="btn-primary" disabled={mutation.isPending}>Enregistrer</button>
           </div>

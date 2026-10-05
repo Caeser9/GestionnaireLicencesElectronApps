@@ -273,7 +273,7 @@ export default function LicensesPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="input max-w-xs"
+          className="input w-full sm:max-w-xs"
         >
           <option value="">Tous les statuts</option>
           {Object.entries(LICENSE_STATUS_LABELS).map(([k, v]) => (
@@ -325,7 +325,7 @@ export default function LicensesPage() {
               ))}
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Max utilisateurs</label>
               <input name="maxUsers" type="number" min="1" className="input" />
@@ -346,7 +346,7 @@ export default function LicensesPage() {
             <label className="label">Notes admin</label>
             <textarea name="adminNotes" className="input" rows={2} />
           </div>
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>
               Annuler
             </button>
@@ -368,7 +368,7 @@ export default function LicensesPage() {
       >
         {editForm && (
           <form onSubmit={handleEditSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="label">Type de licence *</label>
                 <select
@@ -415,7 +415,7 @@ export default function LicensesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
                 <label className="label">Max utilisateurs *</label>
                 <input
@@ -479,7 +479,7 @@ export default function LicensesPage() {
 
             <div>
               <label className="label">Modules autorises</label>
-              <div className="grid grid-cols-2 gap-2 rounded-lg border border-gray-200 p-3">
+              <div className="grid grid-cols-1 gap-2 rounded-lg border border-gray-200 p-3 sm:grid-cols-2">
                 {modules?.map((module) => (
                   <label key={module._id} className="flex items-center gap-2 text-sm">
                     <input
@@ -508,7 +508,7 @@ export default function LicensesPage() {
               />
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 className="btn-secondary"

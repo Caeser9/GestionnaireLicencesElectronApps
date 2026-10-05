@@ -190,7 +190,7 @@ export default function ActivationsPage() {
               </select>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="label">Max utilisateurs</label>
                 <input name="maxUsers" type="number" min="1" className="input" />
@@ -207,7 +207,7 @@ export default function ActivationsPage() {
                 <option value="simple">Simple / raccourcis</option>
               </select>
             </div>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button type="button" className="btn-secondary" onClick={() => setShowApprove(false)}>Annuler</button>
               <button type="submit" className="btn-primary" disabled={approveMutation.isPending}>
                 Approuver
@@ -230,7 +230,7 @@ export default function ActivationsPage() {
             <label className="label">Raison du rejet *</label>
             <textarea name="reason" className="input" rows={3} required />
           </div>
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" className="btn-secondary" onClick={() => setShowReject(false)}>Annuler</button>
             <button type="submit" className="btn-danger" disabled={rejectMutation.isPending}>Rejeter</button>
           </div>
