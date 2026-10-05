@@ -209,7 +209,7 @@ export default function LicensesPage() {
       label: 'Actions',
       render: (_: unknown, row: Record<string, unknown>) => {
         const license = row as unknown as License;
-        if (!hasRole(UserRole.ADMIN)) return null;
+        if (!hasRole(UserRole.MODERATOR)) return null;
         return (
           <div className="flex gap-2">
             <button
@@ -258,7 +258,7 @@ export default function LicensesPage() {
         title="Licences"
         description="Gestion des licences logicielles"
         actions={
-          hasRole(UserRole.ADMIN) && (
+          hasRole(UserRole.MODERATOR) && (
             <button className="btn-primary" onClick={() => setShowModal(true)}>
               <Plus className="h-4 w-4" /> Nouvelle licence
             </button>
