@@ -24,8 +24,8 @@ const navigation = [
   { name: 'Activations', href: '/activations', icon: Bell, role: UserRole.SUPPORT },
   { name: 'Produits', href: '/products', icon: Package, role: UserRole.SUPPORT },
   { name: 'Modules', href: '/modules', icon: Puzzle, role: UserRole.SUPPORT },
-  { name: 'Types de licence', href: '/license-types', icon: Layers, role: UserRole.ADMIN },
-  { name: 'Versions', href: '/versions', icon: GitBranch, role: UserRole.ADMIN },
+  { name: 'Types de licence', href: '/license-types', icon: Layers, role: UserRole.MODERATOR },
+  { name: 'Versions', href: '/versions', icon: GitBranch, role: UserRole.MODERATOR },
   { name: 'Journal d\'audit', href: '/audit', icon: FileText, role: UserRole.ADMIN },
   { name: 'Utilisateurs', href: '/users', icon: Shield, role: UserRole.SUPER_ADMIN },
 ];

@@ -1,4 +1,28 @@
 export declare class StatsService {
+    getProductDashboardStats(productId: string): Promise<{
+        overview: {
+            totalClients: number;
+            activeClients: number;
+            totalLicenses: number;
+            activeLicenses: number;
+            suspendedLicenses: number;
+            expiredLicenses: number;
+            pendingLicenses: number;
+            pendingActivations: number;
+        };
+        recentActivations: (import("mongoose").Document<unknown, {}, import("../models").IActivationLog, {}, {}> & import("../models").IActivationLog & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        })[];
+        productsUsage: any[];
+        recentConnections: (import("mongoose").Document<unknown, {}, import("../models").IActivationLog, {}, {}> & import("../models").IActivationLog & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        })[];
+        installedVersions: any[];
+    }>;
     getDashboardStats(): Promise<{
         overview: {
             totalClients: number;

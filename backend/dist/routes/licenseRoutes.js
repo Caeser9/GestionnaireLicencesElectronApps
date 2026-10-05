@@ -43,7 +43,7 @@ const types_1 = require("../types");
 const router = (0, express_1.Router)();
 router.use(auth_1.authenticate);
 router.get('/', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), licenseController.listLicenses);
-router.get('/activations', (0, auth_1.authorize)(types_1.UserRole.SUPPORT), licenseController.listActivationRequests);
+router.get('/activations', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), licenseController.listActivationRequests);
 router.get('/:id', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), licenseController.getLicense);
 router.get('/:id/logs', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), licenseController.getActivationLogs);
 router.post('/', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), normalizeBody_1.normalizeLicenseNumericFields, (0, validate_1.validateBody)(schemas_1.createLicenseSchema), licenseController.createLicense);
@@ -51,7 +51,7 @@ router.put('/:id', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRol
 router.post('/:id/suspend', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), licenseController.suspendLicense);
 router.post('/:id/reactivate', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), licenseController.reactivateLicense);
 router.post('/:id/transfer', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), licenseController.transferLicense);
-router.post('/activations/:id/approve', (0, auth_1.authorize)(types_1.UserRole.ADMIN), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), normalizeBody_1.normalizeLicenseNumericFields, (0, validate_1.validateBody)(schemas_1.approveActivationSchema), licenseController.approveActivation);
-router.post('/activations/:id/reject', (0, auth_1.authorize)(types_1.UserRole.ADMIN), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), (0, validate_1.validateBody)(schemas_1.rejectActivationSchema), licenseController.rejectActivation);
+router.post('/activations/:id/approve', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), normalizeBody_1.normalizeLicenseNumericFields, (0, validate_1.validateBody)(schemas_1.approveActivationSchema), licenseController.approveActivation);
+router.post('/activations/:id/reject', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), (0, validate_1.validateBody)(schemas_1.rejectActivationSchema), licenseController.rejectActivation);
 exports.default = router;
 //# sourceMappingURL=licenseRoutes.js.map

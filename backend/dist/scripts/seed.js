@@ -32,7 +32,7 @@ async function seed() {
         { slug: 'enterprise', name: 'Enterprise', defaultMaxUsers: 50, defaultMaxWorkstations: 20, defaultModules: ['products', 'stock', 'pos', 'billing', 'reports', 'accounting', 'multi-store'], sortOrder: 4 },
     ];
     for (const lt of licenseTypes) {
-        await models_1.LicenseType.findOneAndUpdate({ slug: lt.slug }, lt, { upsert: true });
+        await models_1.LicenseType.findOneAndUpdate({ slug: lt.slug, product: { $exists: false } }, lt, { upsert: true });
     }
     logger_1.default.info('License types seeded');
     // Sample Products

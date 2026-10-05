@@ -4,8 +4,13 @@ import { AppError } from '../utils/AppError';
 
 export async function getDashboardStats(req: Request, res: Response, next: NextFunction) {
   try {
-    if (req.user?.role === 'moderator') throw new AppError('Statistiques globales non accessibles', 403);
-    const stats = await statsService.getDashboardStats();
+    let stats;
+    if (req.user?.role === 'moderator') {
+      if (!req.user.productId) throw new AppError('Ce compte modérateur doit être associé à une application', 403);
+      stats = await statsService.getProductDashboardStats(req.user.productId);
+    } else {
+      stats = await statsService.getDashboardStats();
+    }
     res.json({ success: true, data: stats });
   } catch (error) {
     next(error);

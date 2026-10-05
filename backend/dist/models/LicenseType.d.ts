@@ -1,6 +1,7 @@
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 export interface ILicenseType extends Document {
     slug: string;
+    product?: Types.ObjectId;
     name: string;
     description?: string;
     defaultMaxUsers: number;
@@ -12,7 +13,7 @@ export interface ILicenseType extends Document {
     updatedAt: Date;
 }
 export declare const LicenseType: mongoose.Model<ILicenseType, {}, {}, {}, mongoose.Document<unknown, {}, ILicenseType, {}, {}> & ILicenseType & Required<{
-    _id: mongoose.Types.ObjectId;
+    _id: Types.ObjectId;
 }> & {
     __v: number;
 }, any>;

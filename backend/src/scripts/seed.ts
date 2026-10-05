@@ -32,7 +32,7 @@ async function seed() {
   ];
 
   for (const lt of licenseTypes) {
-    await LicenseType.findOneAndUpdate({ slug: lt.slug }, lt, { upsert: true });
+    await LicenseType.findOneAndUpdate({ slug: lt.slug, product: { $exists: false } }, lt, { upsert: true });
   }
   logger.info('License types seeded');
 

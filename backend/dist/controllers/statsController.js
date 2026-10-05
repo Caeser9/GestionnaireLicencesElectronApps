@@ -6,9 +6,15 @@ const statsService_1 = require("../services/statsService");
 const AppError_1 = require("../utils/AppError");
 async function getDashboardStats(req, res, next) {
     try {
-        if (req.user?.role === 'moderator')
-            throw new AppError_1.AppError('Statistiques globales non accessibles', 403);
-        const stats = await statsService_1.statsService.getDashboardStats();
+        let stats;
+        if (req.user?.role === 'moderator') {
+            if (!req.user.productId)
+                throw new AppError_1.AppError('Ce compte modérateur doit être associé à une application', 403);
+            stats = await statsService_1.statsService.getProductDashboardStats(req.user.productId);
+        }
+        else {
+            stats = await statsService_1.statsService.getDashboardStats();
+        }
         res.json({ success: true, data: stats });
     }
     catch (error) {

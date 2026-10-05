@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { Product, User } from '../models';
+import { LicenseType, Product, User } from '../models';
 import { config } from '../config';
 import { AppError, assertFound } from '../utils/AppError';
 import { JwtPayload, UserRole } from '../types';
@@ -90,6 +90,28 @@ export class AuthService {
       throw new AppError('Seul un modérateur peut être associé à une application', 400);
     }
     const user = await User.create(data);
+
+    if (user.role === UserRole.MODERATOR && user.productId) {
+      const sharedTypes = await LicenseType.find({ product: { $exists: false } });
+      for (const sharedType of sharedTypes) {
+        const scopedSlug = `${sharedType.slug}-${user.productId.toString().slice(-6)}`;
+        await LicenseType.updateOne(
+          { product: user.productId, slug: scopedSlug },
+          { $setOnInsert: {
+            product: user.productId,
+            slug: scopedSlug,
+            name: sharedType.name,
+            description: sharedType.description,
+            defaultMaxUsers: sharedType.defaultMaxUsers,
+            defaultMaxWorkstations: sharedType.defaultMaxWorkstations,
+            defaultModules: sharedType.defaultModules,
+            sortOrder: sharedType.sortOrder,
+            isActive: sharedType.isActive,
+          } },
+          { upsert: true }
+        );
+      }
+    }
 
     await createAuditLog(creator, {
       action: AuditAction.CREATE,

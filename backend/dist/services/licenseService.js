@@ -190,6 +190,9 @@ class LicenseService {
                 email: activationRequest.contactEmail,
                 phone: activationRequest.contactPhone,
                 createdBy: approver.userId,
+                ...(approver.role === types_1.UserRole.MODERATOR && approver.productId
+                    ? { platformProduct: approver.productId }
+                    : {}),
             });
         }
         const license = await this.createLicense({

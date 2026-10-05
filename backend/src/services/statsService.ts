@@ -9,6 +9,49 @@ import {
 import { LicenseStatus, ActivationRequestStatus } from '../types';
 
 export class StatsService {
+  async getProductDashboardStats(productId: string) {
+    const licenseFilter = { product: productId };
+    const clientIds = await License.distinct('client', licenseFilter);
+    const application = await Product.findById(productId).select('name');
+    const clientFilter = { $or: [{ platformProduct: productId }, { _id: { $in: clientIds } }] };
+    const [
+      totalClients, activeClients, totalLicenses, activeLicenses, suspendedLicenses,
+      expiredLicenses, pendingLicenses, pendingActivations, recentActivations,
+      productsUsage, recentConnections, installedVersions,
+    ] = await Promise.all([
+      Client.countDocuments(clientFilter),
+      Client.countDocuments({ ...clientFilter, isActive: true }),
+      License.countDocuments(licenseFilter),
+      License.countDocuments({ ...licenseFilter, status: LicenseStatus.ACTIVE }),
+      License.countDocuments({ ...licenseFilter, status: LicenseStatus.SUSPENDED }),
+      License.countDocuments({ ...licenseFilter, status: LicenseStatus.EXPIRED }),
+      License.countDocuments({ ...licenseFilter, status: LicenseStatus.PENDING }),
+      ActivationRequest.countDocuments({ product: productId, status: ActivationRequestStatus.PENDING }),
+      ActivationLog.find({ product: productId, action: 'activate' }).sort({ createdAt: -1 }).limit(10)
+        .populate('client', 'companyName').populate('product', 'name slug'),
+      License.aggregate([
+        { $match: { ...licenseFilter, status: LicenseStatus.ACTIVE } },
+        { $group: { _id: '$product', count: { $sum: 1 } } },
+        { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'product' } },
+        { $unwind: '$product' },
+        { $project: { productId: '$_id', productName: '$product.name', productSlug: '$product.slug', count: 1 } },
+      ]),
+      ActivationLog.find({ product: productId, action: { $in: ['verify', 'heartbeat'] } })
+        .sort({ createdAt: -1 }).limit(15).populate('client', 'companyName').populate('product', 'name'),
+      ActivationLog.aggregate([
+        { $match: { product: productId } },
+        { $group: { _id: '$appVersion', count: { $sum: 1 }, lastSeen: { $max: '$createdAt' } } },
+        { $sort: { count: -1 } }, { $limit: 20 },
+        { $project: { productName: { $literal: application?.name || '' }, version: '$_id', installations: '$count', lastSeen: 1 } },
+      ]),
+    ]);
+    return {
+      overview: { totalClients, activeClients, totalLicenses, activeLicenses, suspendedLicenses,
+        expiredLicenses, pendingLicenses, pendingActivations },
+      recentActivations, productsUsage, recentConnections, installedVersions,
+    };
+  }
+
   async getDashboardStats() {
     const [
       totalClients,

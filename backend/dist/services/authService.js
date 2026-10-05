@@ -78,6 +78,23 @@ class AuthService {
             throw new AppError_1.AppError('Seul un modérateur peut être associé à une application', 400);
         }
         const user = await models_1.User.create(data);
+        if (user.role === types_1.UserRole.MODERATOR && user.productId) {
+            const sharedTypes = await models_1.LicenseType.find({ product: { $exists: false } });
+            for (const sharedType of sharedTypes) {
+                const scopedSlug = `${sharedType.slug}-${user.productId.toString().slice(-6)}`;
+                await models_1.LicenseType.updateOne({ product: user.productId, slug: scopedSlug }, { $setOnInsert: {
+                        product: user.productId,
+                        slug: scopedSlug,
+                        name: sharedType.name,
+                        description: sharedType.description,
+                        defaultMaxUsers: sharedType.defaultMaxUsers,
+                        defaultMaxWorkstations: sharedType.defaultMaxWorkstations,
+                        defaultModules: sharedType.defaultModules,
+                        sortOrder: sharedType.sortOrder,
+                        isActive: sharedType.isActive,
+                    } }, { upsert: true });
+            }
+        }
         await (0, audit_1.createAuditLog)(creator, {
             action: types_2.AuditAction.CREATE,
             resource: types_2.AuditResource.USER,

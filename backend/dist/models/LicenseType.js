@@ -37,6 +37,7 @@ exports.LicenseType = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const licenseTypeSchema = new mongoose_1.Schema({
     slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    product: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product', index: true },
     name: { type: String, required: true, trim: true },
     description: { type: String },
     defaultMaxUsers: { type: Number, default: 1, min: 1 },

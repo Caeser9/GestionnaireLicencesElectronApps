@@ -110,6 +110,12 @@ async function createLicense(req, res, next) {
             ]);
             if (!owned || !assignedProduct)
                 throw new AppError_1.AppError('Client ou application hors de votre périmètre', 403);
+            const licenseTypeIsScoped = await models_1.LicenseType.exists({
+                _id: req.body.licenseType,
+                product: req.user.productId,
+            });
+            if (!licenseTypeIsScoped)
+                throw new AppError_1.AppError('Type de licence hors de votre application', 403);
         }
         const license = await licenseService_1.licenseService.createLicense(req.body, req.user, req);
         res.status(201).json({ success: true, data: license });
@@ -121,6 +127,11 @@ async function createLicense(req, res, next) {
 async function updateLicense(req, res, next) {
     try {
         await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
+        if (req.user?.role === 'moderator' && req.body.licenseType) {
+            const licenseTypeIsScoped = await models_1.LicenseType.exists({ _id: req.body.licenseType, product: req.user.productId });
+            if (!licenseTypeIsScoped)
+                throw new AppError_1.AppError('Type de licence hors de votre application', 403);
+        }
         const license = await licenseService_1.licenseService.updateLicense((0, params_1.getParamId)(req.params), req.body, req.user, req);
         res.json({ success: true, data: license });
     }
@@ -171,13 +182,16 @@ async function getActivationLogs(req, res, next) {
 }
 async function listActivationRequests(req, res, next) {
     try {
-        if (req.user?.role === 'moderator')
-            throw new AppError_1.AppError('Accès non autorisé', 403);
         const { ActivationRequest } = await Promise.resolve().then(() => __importStar(require('../models')));
         const { status } = req.query;
         const filter = {};
         if (status)
             filter.status = status;
+        if (req.user?.role === 'moderator') {
+            if (!req.user.productId)
+                throw new AppError_1.AppError('Ce compte modérateur doit être associé à une application', 403);
+            filter.product = req.user.productId;
+        }
         const requests = await ActivationRequest.find(filter)
             .populate('product', 'name slug')
             .populate('license')
@@ -191,6 +205,24 @@ async function listActivationRequests(req, res, next) {
 }
 async function approveActivation(req, res, next) {
     try {
+        await assertActivationProduct(req);
+        if (req.user?.role === 'moderator') {
+            const licenseTypeIsScoped = await models_1.LicenseType.exists({
+                _id: req.body.licenseTypeId,
+                product: req.user.productId,
+            });
+            if (!licenseTypeIsScoped)
+                throw new AppError_1.AppError('Type de licence hors de votre application', 403);
+        }
+        if (req.user?.role === 'moderator' && req.body.clientId) {
+            const existingClientIds = await tenantClientIds(req);
+            const clientInApplication = await models_1.Client.exists({ _id: req.body.clientId, $or: [
+                    { platformProduct: req.user.productId },
+                    { _id: { $in: existingClientIds } },
+                ] });
+            if (!clientInApplication)
+                throw new AppError_1.AppError('Client hors de votre application', 403);
+        }
         const result = await licenseService_1.licenseService.approveActivation((0, params_1.getParamId)(req.params), req.body, req.user, req);
         res.json({ success: true, data: result });
     }
@@ -200,11 +232,25 @@ async function approveActivation(req, res, next) {
 }
 async function rejectActivation(req, res, next) {
     try {
+        await assertActivationProduct(req);
         const result = await licenseService_1.licenseService.rejectActivation((0, params_1.getParamId)(req.params), req.body.reason, req.user, req);
         res.json({ success: true, data: result });
     }
     catch (error) {
         next(error);
     }
+}
+async function assertActivationProduct(req) {
+    if (req.user?.role !== 'moderator')
+        return;
+    const { ActivationRequest } = await Promise.resolve().then(() => __importStar(require('../models')));
+    if (!req.user.productId)
+        throw new AppError_1.AppError('Ce compte modérateur doit être associé à une application', 403);
+    const activation = await ActivationRequest.findOne({
+        _id: (0, params_1.getParamId)(req.params),
+        product: req.user.productId,
+    }).select('_id');
+    if (!activation)
+        throw new AppError_1.AppError('Demande hors de votre application', 403);
 }
 //# sourceMappingURL=licenseController.js.map

@@ -66,6 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hasRole = (role: UserRole) => {
     if (!user) return false;
+    if (role === UserRole.MODERATOR) {
+      return user.role === UserRole.MODERATOR || ROLE_HIERARCHY[user.role] > ROLE_HIERARCHY[UserRole.MODERATOR];
+    }
     return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[role];
   };
 

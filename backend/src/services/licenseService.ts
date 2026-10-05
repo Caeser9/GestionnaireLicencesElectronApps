@@ -20,6 +20,7 @@ import {
   JwtPayload,
   AuditAction,
   AuditResource,
+  UserRole,
 } from '../types';
 import { createAuditLog } from '../middleware/audit';
 import { config } from '../config';
@@ -286,6 +287,9 @@ export class LicenseService {
         email: activationRequest.contactEmail,
         phone: activationRequest.contactPhone,
         createdBy: approver.userId,
+        ...(approver.role === UserRole.MODERATOR && approver.productId
+          ? { platformProduct: approver.productId }
+          : {}),
       });
     }
 

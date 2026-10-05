@@ -1,7 +1,8 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface ILicenseType extends Document {
   slug: string;
+  product?: Types.ObjectId;
   name: string;
   description?: string;
   defaultMaxUsers: number;
@@ -16,6 +17,7 @@ export interface ILicenseType extends Document {
 const licenseTypeSchema = new Schema<ILicenseType>(
   {
     slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
     name: { type: String, required: true, trim: true },
     description: { type: String },
     defaultMaxUsers: { type: Number, default: 1, min: 1 },
@@ -26,5 +28,6 @@ const licenseTypeSchema = new Schema<ILicenseType>(
   },
   { timestamps: true }
 );
+
 
 export const LicenseType = mongoose.model<ILicenseType>('LicenseType', licenseTypeSchema);
