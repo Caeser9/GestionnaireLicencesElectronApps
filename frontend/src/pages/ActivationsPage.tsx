@@ -179,7 +179,7 @@ export default function ActivationsPage() {
                 <p className="text-sm text-gray-500">Chargement...</p>
               ) : typesError || !licenseTypes?.length ? (
                 <p className="text-sm text-red-600">
-                  Aucun type de licence. Exécutez <code className="bg-gray-100 px-1">npm run seed</code> sur le serveur.
+                  Aucun type de licence n’est disponible pour cette application. Contactez un administrateur.
                 </p>
               ) : (
               <select name="licenseTypeId" className="input" required defaultValue="">
