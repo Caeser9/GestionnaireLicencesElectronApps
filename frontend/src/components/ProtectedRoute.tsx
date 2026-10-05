@@ -4,9 +4,10 @@ import { UserRole } from '../types';
 
 interface ProtectedRouteProps {
   minRole?: UserRole;
+  disallowRoles?: UserRole[];
 }
 
-export default function ProtectedRoute({ minRole = UserRole.SUPPORT }: ProtectedRouteProps) {
+export default function ProtectedRoute({ minRole = UserRole.SUPPORT, disallowRoles = [] }: ProtectedRouteProps) {
   const { user, isLoading, hasRole } = useAuth();
 
   if (isLoading) {
@@ -22,6 +23,10 @@ export default function ProtectedRoute({ minRole = UserRole.SUPPORT }: Protected
   }
 
   if (!hasRole(minRole)) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user && disallowRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 

@@ -19,7 +19,7 @@ router.use('/products', createCrudRouter(Product, createProductSchema, updatePro
   resource: AuditResource.PRODUCT,
   resourceLabel: 'produit',
   readRoles: [UserRole.SUPPORT, UserRole.MODERATOR],
-  writeRoles: [UserRole.ADMIN, UserRole.MODERATOR],
+  writeRoles: [UserRole.ADMIN],
   moderatorScope: 'self',
 }));
 
@@ -27,7 +27,7 @@ router.use('/modules', createCrudRouter(Module, createModuleSchema, updateModule
   resource: AuditResource.MODULE,
   resourceLabel: 'module',
   readRoles: [UserRole.SUPPORT, UserRole.MODERATOR],
-  writeRoles: [UserRole.ADMIN, UserRole.MODERATOR],
+  writeRoles: [UserRole.ADMIN],
   moderatorScope: 'product',
   moderatorCanCreate: true,
 }));
@@ -36,7 +36,7 @@ router.use('/license-types', createCrudRouter(LicenseType, createLicenseTypeSche
   resource: AuditResource.LICENSE_TYPE,
   resourceLabel: 'type de licence',
   readRoles: [UserRole.SUPPORT, UserRole.MODERATOR],
-  writeRoles: [UserRole.ADMIN, UserRole.MODERATOR],
+  writeRoles: [UserRole.ADMIN],
   moderatorScope: 'product',
   moderatorCanCreate: true,
 }));
@@ -45,7 +45,7 @@ router.use('/app-versions', createCrudRouter(AppVersion, createAppVersionSchema,
   resource: AuditResource.APP_VERSION,
   resourceLabel: 'version application',
   readRoles: [UserRole.SUPPORT, UserRole.MODERATOR],
-  writeRoles: [UserRole.ADMIN, UserRole.MODERATOR],
+  writeRoles: [UserRole.ADMIN],
   moderatorScope: 'product',
   moderatorCanCreate: true,
 }));

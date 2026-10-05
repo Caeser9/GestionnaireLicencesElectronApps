@@ -48,7 +48,9 @@ export default function Layout() {
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navigation
-            .filter((item) => hasRole(item.role))
+            .filter((item) => user?.role === UserRole.MODERATOR
+              ? ['/', '/clients', '/licenses', '/activations'].includes(item.href)
+              : hasRole(item.role))
             .map((item) => (
               <NavLink
                 key={item.href}

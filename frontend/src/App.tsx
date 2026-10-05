@@ -33,10 +33,12 @@ function App() {
           <Route path="clients" element={<ClientsPage />} />
           <Route path="licenses" element={<LicensesPage />} />
           <Route path="activations" element={<ActivationsPage />} />
-          <Route path="products" element={<ProductsPage />} />
-          <Route path="modules" element={<ModulesPage />} />
-          <Route path="license-types" element={<LicenseTypesPage />} />
-          <Route path="versions" element={<VersionsPage />} />
+          <Route element={<ProtectedRoute disallowRoles={[UserRole.MODERATOR]} />}>
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="modules" element={<ModulesPage />} />
+            <Route path="license-types" element={<LicenseTypesPage />} />
+            <Route path="versions" element={<VersionsPage />} />
+          </Route>
           <Route element={<ProtectedRoute minRole={UserRole.ADMIN} />}>
             <Route path="audit" element={<AuditPage />} />
           </Route>
