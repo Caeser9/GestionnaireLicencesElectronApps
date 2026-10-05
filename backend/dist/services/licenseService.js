@@ -29,6 +29,7 @@ class LicenseService {
             maxUsers: data.maxUsers ?? licenseType.defaultMaxUsers,
             maxWorkstations: data.maxWorkstations ?? licenseType.defaultMaxWorkstations,
             authorizedModules: data.authorizedModules ?? licenseType.defaultModules,
+            dashboardMode: data.dashboardMode,
             minVersion: data.minVersion,
             maxVersion: data.maxVersion,
             expiresAt: data.expiresAt ? new Date(data.expiresAt) : undefined,
@@ -122,6 +123,7 @@ class LicenseService {
             maxUsers: populated.maxUsers,
             maxWorkstations: populated.maxWorkstations,
             authorizedModules: populated.authorizedModules,
+            dashboardMode: populated.dashboardMode,
             minVersion: populated.minVersion,
             maxVersion: populated.maxVersion,
             machineId: populated.machineId || '',
@@ -149,6 +151,7 @@ class LicenseService {
             maxUsers: license.maxUsers,
             maxWorkstations: license.maxWorkstations,
             authorizedModules: license.authorizedModules,
+            dashboardMode: license.dashboardMode,
             minVersion: license.minVersion,
             maxVersion: license.maxVersion,
             machineId: license.machineId || '',
@@ -196,6 +199,7 @@ class LicenseService {
             maxUsers: data.maxUsers,
             maxWorkstations: data.maxWorkstations,
             authorizedModules: data.authorizedModules,
+            dashboardMode: data.dashboardMode,
             expiresAt: data.expiresAt,
             adminNotes: data.adminNotes,
         }, approver, req);
@@ -248,6 +252,8 @@ class LicenseService {
             filter.client = query.client;
         if (query.product)
             filter.product = query.product;
+        if (query.clientIds)
+            filter.client = { $in: query.clientIds };
         if (query.search) {
             filter.licenseKey = { $regex: query.search, $options: 'i' };
         }

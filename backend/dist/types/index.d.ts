@@ -1,7 +1,8 @@
 export declare enum UserRole {
     SUPER_ADMIN = "super_admin",
     ADMIN = "admin",
-    SUPPORT = "support"
+    SUPPORT = "support",
+    MODERATOR = "moderator"
 }
 export declare enum LicenseStatus {
     PENDING = "pending",
@@ -42,6 +43,7 @@ export interface JwtPayload {
     userId: string;
     email: string;
     role: UserRole;
+    productId?: string;
 }
 export interface SignedLicensePayload {
     licenseId: string;
@@ -55,6 +57,7 @@ export interface SignedLicensePayload {
     maxUsers: number;
     maxWorkstations: number;
     authorizedModules: string[];
+    dashboardMode?: 'pro' | 'simple';
     minVersion?: string;
     maxVersion?: string;
     machineId: string;

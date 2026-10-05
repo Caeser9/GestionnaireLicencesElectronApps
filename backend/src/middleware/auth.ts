@@ -37,7 +37,9 @@ export function authorize(...roles: UserRole[]) {
       return;
     }
 
-    const allowed = roles.some((role) => hasMinimumRole(req.user!.role, role));
+    const allowed = roles.some((role) => role === UserRole.MODERATOR
+      ? req.user!.role === UserRole.MODERATOR
+      : hasMinimumRole(req.user!.role, role));
     if (!allowed) {
       next(new AppError('Accès non autorisé', 403));
       return;

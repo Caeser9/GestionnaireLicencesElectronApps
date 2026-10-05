@@ -9,11 +9,11 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get('/', authorize(UserRole.SUPPORT), clientController.listClients);
-router.get('/:id', authorize(UserRole.SUPPORT), validateParams(mongoIdSchema), clientController.getClient);
-router.get('/:id/history', authorize(UserRole.SUPPORT), validateParams(mongoIdSchema), clientController.getClientHistory);
-router.post('/', authorize(UserRole.ADMIN), validateBody(createClientSchema), clientController.createClient);
-router.put('/:id', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), validateBody(updateClientSchema), clientController.updateClient);
-router.delete('/:id', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), clientController.deleteClient);
+router.get('/', authorize(UserRole.SUPPORT, UserRole.MODERATOR), clientController.listClients);
+router.get('/:id', authorize(UserRole.SUPPORT, UserRole.MODERATOR), validateParams(mongoIdSchema), clientController.getClient);
+router.get('/:id/history', authorize(UserRole.SUPPORT, UserRole.MODERATOR), validateParams(mongoIdSchema), clientController.getClientHistory);
+router.post('/', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateBody(createClientSchema), clientController.createClient);
+router.put('/:id', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateParams(mongoIdSchema), validateBody(updateClientSchema), clientController.updateClient);
+router.delete('/:id', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateParams(mongoIdSchema), clientController.deleteClient);
 
 export default router;

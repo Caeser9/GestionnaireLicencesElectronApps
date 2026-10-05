@@ -368,6 +368,7 @@ export class LicenseService {
     status?: LicenseStatus;
     client?: string;
     product?: string;
+    clientIds?: string[];
   }) {
     const page = query.page || 1;
     const limit = query.limit || 20;
@@ -376,6 +377,7 @@ export class LicenseService {
     if (query.status) filter.status = query.status;
     if (query.client) filter.client = query.client;
     if (query.product) filter.product = query.product;
+    if (query.clientIds) filter.client = { $in: query.clientIds };
 
     if (query.search) {
       filter.licenseKey = { $regex: query.search, $options: 'i' };

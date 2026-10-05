@@ -47,6 +47,7 @@ const clientSchema = new mongoose_1.Schema({
     notes: { type: String },
     isActive: { type: Boolean, default: true },
     createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
+    platformProduct: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product', index: true },
 }, { timestamps: true });
 clientSchema.index({ companyName: 'text', email: 'text', contactName: 'text' });
 clientSchema.index({ email: 1 });

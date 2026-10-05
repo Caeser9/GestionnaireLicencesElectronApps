@@ -12,6 +12,7 @@ export interface IClient extends Document {
   notes?: string;
   isActive: boolean;
   createdBy: Types.ObjectId;
+  platformProduct?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,7 @@ const clientSchema = new Schema<IClient>(
     notes: { type: String },
     isActive: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    platformProduct: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
   },
   { timestamps: true }
 );

@@ -8,6 +8,7 @@ export interface IUser extends Document {
   firstName: string;
   lastName: string;
   role: UserRole;
+  productId?: mongoose.Types.ObjectId;
   isActive: boolean;
   lastLoginAt?: Date;
   createdAt: Date;
@@ -27,6 +28,7 @@ const userSchema = new Schema<IUser>(
       enum: Object.values(UserRole),
       default: UserRole.SUPPORT,
     },
+    productId: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
   },

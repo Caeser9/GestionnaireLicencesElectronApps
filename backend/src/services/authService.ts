@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { User } from '../models';
+import { Product, User } from '../models';
 import { config } from '../config';
 import { AppError, assertFound } from '../utils/AppError';
 import { JwtPayload, UserRole } from '../types';
@@ -26,6 +26,7 @@ export class AuthService {
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
+      ...(user.productId ? { productId: user.productId.toString() } : {}),
     };
 
     const token = jwt.sign(payload, config.jwt.secret, {
@@ -46,6 +47,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        productId: user.productId?.toString(),
         fullName: user.fullName,
       },
     };
@@ -59,6 +61,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
+      productId: user.productId?.toString(),
       fullName: user.fullName,
       lastLoginAt: user.lastLoginAt,
     };
@@ -70,12 +73,22 @@ export class AuthService {
     firstName: string;
     lastName: string;
     role: UserRole;
+    productId?: string;
   }, creator: JwtPayload, req?: Request) {
     const existing = await User.findOne({ email: data.email.toLowerCase() });
     if (existing) {
       throw new AppError('Cet email est déjà utilisé', 409);
     }
 
+    if (data.role === UserRole.MODERATOR && !data.productId) {
+      throw new AppError('Une application doit être associée au modérateur', 400);
+    }
+    if (data.role === UserRole.MODERATOR && !(await Product.exists({ _id: data.productId, isActive: true }))) {
+      throw new AppError('Application introuvable ou inactive', 404);
+    }
+    if (data.role !== UserRole.MODERATOR && data.productId) {
+      throw new AppError('Seul un modérateur peut être associé à une application', 400);
+    }
     const user = await User.create(data);
 
     await createAuditLog(creator, {

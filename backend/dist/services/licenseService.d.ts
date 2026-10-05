@@ -13,6 +13,7 @@ export declare class LicenseService {
         maxUsers?: number;
         maxWorkstations?: number;
         authorizedModules?: string[];
+        dashboardMode?: 'pro' | 'simple';
         minVersion?: string;
         maxVersion?: string;
         expiresAt?: string | null;
@@ -41,6 +42,7 @@ export declare class LicenseService {
         maxUsers?: number;
         maxWorkstations?: number;
         authorizedModules?: string[];
+        dashboardMode?: 'pro' | 'simple';
         expiresAt?: string | null;
         adminNotes?: string;
     }, approver: JwtPayload, req?: Request): Promise<{
@@ -59,6 +61,7 @@ export declare class LicenseService {
         status?: LicenseStatus;
         client?: string;
         product?: string;
+        clientIds?: string[];
     }): Promise<{
         items: (import("mongoose").Document<unknown, {}, import("../models").ILicense, {}, {}> & import("../models").ILicense & Required<{
             _id: import("mongoose").Types.ObjectId;

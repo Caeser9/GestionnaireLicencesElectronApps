@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { statsService } from '../services/statsService';
+import { AppError } from '../utils/AppError';
 
-export async function getDashboardStats(_req: Request, res: Response, next: NextFunction) {
+export async function getDashboardStats(req: Request, res: Response, next: NextFunction) {
   try {
+    if (req.user?.role === 'moderator') throw new AppError('Statistiques globales non accessibles', 403);
     const stats = await statsService.getDashboardStats();
     res.json({ success: true, data: stats });
   } catch (error) {

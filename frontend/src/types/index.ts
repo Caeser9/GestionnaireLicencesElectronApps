@@ -2,6 +2,7 @@ export enum UserRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
   SUPPORT = 'support',
+  MODERATOR = 'moderator',
 }
 
 export enum LicenseStatus {
@@ -23,6 +24,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  productId?: string;
   fullName: string;
   lastLoginAt?: string;
 }
@@ -40,6 +42,7 @@ export interface Client {
   notes?: string;
   isActive: boolean;
   createdAt: string;
+  platformProduct?: string;
 }
 
 export interface Product {
@@ -159,4 +162,5 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.SUPER_ADMIN]: 'Super Admin',
   [UserRole.ADMIN]: 'Administrateur',
   [UserRole.SUPPORT]: 'Support Technique',
+  [UserRole.MODERATOR]: 'Modérateur client',
 };

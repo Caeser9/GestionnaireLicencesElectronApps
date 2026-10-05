@@ -41,11 +41,11 @@ const clientController = __importStar(require("../controllers/clientController")
 const types_1 = require("../types");
 const router = (0, express_1.Router)();
 router.use(auth_1.authenticate);
-router.get('/', (0, auth_1.authorize)(types_1.UserRole.SUPPORT), clientController.listClients);
-router.get('/:id', (0, auth_1.authorize)(types_1.UserRole.SUPPORT), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), clientController.getClient);
-router.get('/:id/history', (0, auth_1.authorize)(types_1.UserRole.SUPPORT), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), clientController.getClientHistory);
-router.post('/', (0, auth_1.authorize)(types_1.UserRole.ADMIN), (0, validate_1.validateBody)(schemas_1.createClientSchema), clientController.createClient);
-router.put('/:id', (0, auth_1.authorize)(types_1.UserRole.ADMIN), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), (0, validate_1.validateBody)(schemas_1.updateClientSchema), clientController.updateClient);
-router.delete('/:id', (0, auth_1.authorize)(types_1.UserRole.ADMIN), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), clientController.deleteClient);
+router.get('/', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), clientController.listClients);
+router.get('/:id', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), clientController.getClient);
+router.get('/:id/history', (0, auth_1.authorize)(types_1.UserRole.SUPPORT, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), clientController.getClientHistory);
+router.post('/', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateBody)(schemas_1.createClientSchema), clientController.createClient);
+router.put('/:id', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), (0, validate_1.validateBody)(schemas_1.updateClientSchema), clientController.updateClient);
+router.delete('/:id', (0, auth_1.authorize)(types_1.UserRole.ADMIN, types_1.UserRole.MODERATOR), (0, validate_1.validateParams)(schemas_1.mongoIdSchema), clientController.deleteClient);
 exports.default = router;
 //# sourceMappingURL=clientRoutes.js.map

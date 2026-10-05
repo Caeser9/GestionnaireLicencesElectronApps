@@ -9,6 +9,7 @@ export declare class AuthService {
             firstName: string;
             lastName: string;
             role: UserRole;
+            productId: string | undefined;
             fullName: string;
         };
     }>;
@@ -18,6 +19,7 @@ export declare class AuthService {
         firstName: any;
         lastName: any;
         role: any;
+        productId: any;
         fullName: any;
         lastLoginAt: any;
     }>;
@@ -27,6 +29,7 @@ export declare class AuthService {
         firstName: string;
         lastName: string;
         role: UserRole;
+        productId?: string;
     }, creator: JwtPayload, req?: Request): Promise<import("mongoose").Document<unknown, {}, import("../models").IUser, {}, {}> & import("../models").IUser & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {

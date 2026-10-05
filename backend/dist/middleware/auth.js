@@ -9,6 +9,7 @@ exports.optionalAuth = optionalAuth;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config");
 const AppError_1 = require("../utils/AppError");
+const types_1 = require("../types");
 const roles_1 = require("../utils/roles");
 function authenticate(req, _res, next) {
     const authHeader = req.headers.authorization;
@@ -32,7 +33,9 @@ function authorize(...roles) {
             next(new AppError_1.AppError('Authentification requise', 401));
             return;
         }
-        const allowed = roles.some((role) => (0, roles_1.hasMinimumRole)(req.user.role, role));
+        const allowed = roles.some((role) => role === types_1.UserRole.MODERATOR
+            ? req.user.role === types_1.UserRole.MODERATOR
+            : (0, roles_1.hasMinimumRole)(req.user.role, role));
         if (!allowed) {
             next(new AppError_1.AppError('Accès non autorisé', 403));
             return;

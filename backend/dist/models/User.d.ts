@@ -6,6 +6,7 @@ export interface IUser extends Document {
     firstName: string;
     lastName: string;
     role: UserRole;
+    productId?: mongoose.Types.ObjectId;
     isActive: boolean;
     lastLoginAt?: Date;
     createdAt: Date;

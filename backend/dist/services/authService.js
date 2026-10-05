@@ -8,8 +8,9 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const models_1 = require("../models");
 const config_1 = require("../config");
 const AppError_1 = require("../utils/AppError");
-const audit_1 = require("../middleware/audit");
 const types_1 = require("../types");
+const audit_1 = require("../middleware/audit");
+const types_2 = require("../types");
 class AuthService {
     async login(email, password, req) {
         const user = await models_1.User.findOne({ email: email.toLowerCase() }).select('+password');
@@ -26,13 +27,14 @@ class AuthService {
             userId: user._id.toString(),
             email: user.email,
             role: user.role,
+            ...(user.productId ? { productId: user.productId.toString() } : {}),
         };
         const token = jsonwebtoken_1.default.sign(payload, config_1.config.jwt.secret, {
             expiresIn: config_1.config.jwt.expiresIn,
         });
         await (0, audit_1.createAuditLog)(payload, {
-            action: types_1.AuditAction.LOGIN,
-            resource: types_1.AuditResource.AUTH,
+            action: types_2.AuditAction.LOGIN,
+            resource: types_2.AuditResource.AUTH,
             description: `Connexion de ${user.email}`,
         }, req);
         return {
@@ -43,6 +45,7 @@ class AuthService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+                productId: user.productId?.toString(),
                 fullName: user.fullName,
             },
         };
@@ -55,6 +58,7 @@ class AuthService {
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role,
+            productId: user.productId?.toString(),
             fullName: user.fullName,
             lastLoginAt: user.lastLoginAt,
         };
@@ -64,10 +68,19 @@ class AuthService {
         if (existing) {
             throw new AppError_1.AppError('Cet email est déjà utilisé', 409);
         }
+        if (data.role === types_1.UserRole.MODERATOR && !data.productId) {
+            throw new AppError_1.AppError('Une application doit être associée au modérateur', 400);
+        }
+        if (data.role === types_1.UserRole.MODERATOR && !(await models_1.Product.exists({ _id: data.productId, isActive: true }))) {
+            throw new AppError_1.AppError('Application introuvable ou inactive', 404);
+        }
+        if (data.role !== types_1.UserRole.MODERATOR && data.productId) {
+            throw new AppError_1.AppError('Seul un modérateur peut être associé à une application', 400);
+        }
         const user = await models_1.User.create(data);
         await (0, audit_1.createAuditLog)(creator, {
-            action: types_1.AuditAction.CREATE,
-            resource: types_1.AuditResource.USER,
+            action: types_2.AuditAction.CREATE,
+            resource: types_2.AuditResource.USER,
             resourceId: user._id.toString(),
             description: `Création de l'utilisateur ${user.email}`,
         }, req);
@@ -86,8 +99,8 @@ class AuthService {
         Object.assign(user, data);
         await user.save();
         await (0, audit_1.createAuditLog)(updater, {
-            action: types_1.AuditAction.UPDATE,
-            resource: types_1.AuditResource.USER,
+            action: types_2.AuditAction.UPDATE,
+            resource: types_2.AuditResource.USER,
             resourceId: id,
             description: `Modification de l'utilisateur ${user.email}`,
             changes: data,

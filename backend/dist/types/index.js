@@ -6,6 +6,7 @@ var UserRole;
     UserRole["SUPER_ADMIN"] = "super_admin";
     UserRole["ADMIN"] = "admin";
     UserRole["SUPPORT"] = "support";
+    UserRole["MODERATOR"] = "moderator";
 })(UserRole || (exports.UserRole = UserRole = {}));
 var LicenseStatus;
 (function (LicenseStatus) {

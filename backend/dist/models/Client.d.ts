@@ -11,6 +11,7 @@ export interface IClient extends Document {
     notes?: string;
     isActive: boolean;
     createdBy: Types.ObjectId;
+    platformProduct?: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

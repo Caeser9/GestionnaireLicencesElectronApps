@@ -46,6 +46,30 @@ exports.approveActivation = approveActivation;
 exports.rejectActivation = rejectActivation;
 const licenseService_1 = require("../services/licenseService");
 const params_1 = require("../utils/params");
+const models_1 = require("../models");
+const AppError_1 = require("../utils/AppError");
+async function tenantClientIds(req) {
+    if (req.user?.role !== 'moderator')
+        return undefined;
+    if (!req.user.productId) {
+        throw new AppError_1.AppError('Ce compte modérateur doit être associé à une application', 403);
+    }
+    const clientIds = await models_1.License.distinct('client', { product: req.user.productId });
+    return clientIds.map((clientId) => clientId.toString());
+}
+async function assertLicenseAccess(req, licenseId) {
+    if (req.user?.role !== 'moderator')
+        return;
+    if (!req.user.productId) {
+        throw new AppError_1.AppError('Ce compte modérateur doit être associé à une application', 403);
+    }
+    const license = await models_1.License.findById(licenseId).select('client');
+    if (!license)
+        throw new AppError_1.AppError('Licence non trouvée', 404);
+    const belongsToProduct = await models_1.License.exists({ _id: licenseId, product: req.user.productId });
+    if (!belongsToProduct)
+        throw new AppError_1.AppError('Licence hors de votre application', 403);
+}
 async function listLicenses(req, res, next) {
     try {
         const result = await licenseService_1.licenseService.listLicenses({
@@ -54,7 +78,8 @@ async function listLicenses(req, res, next) {
             search: req.query.search,
             status: req.query.status,
             client: req.query.client,
-            product: req.query.product,
+            product: req.user?.role === 'moderator' ? req.user.productId : req.query.product,
+            clientIds: await tenantClientIds(req),
         });
         res.json({ success: true, data: result });
     }
@@ -65,6 +90,7 @@ async function listLicenses(req, res, next) {
 async function getLicense(req, res, next) {
     try {
         const license = await licenseService_1.licenseService.getLicense((0, params_1.getParamId)(req.params));
+        await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
         res.json({ success: true, data: license });
     }
     catch (error) {
@@ -73,6 +99,18 @@ async function getLicense(req, res, next) {
 }
 async function createLicense(req, res, next) {
     try {
+        if (req.user?.role === 'moderator') {
+            const existingClientIds = await tenantClientIds(req);
+            const [owned, assignedProduct] = await Promise.all([
+                models_1.Client.exists({ _id: req.body.client, $or: [
+                        { platformProduct: req.user.productId },
+                        { _id: { $in: existingClientIds } },
+                    ] }),
+                Promise.resolve(String(req.body.product) === req.user.productId),
+            ]);
+            if (!owned || !assignedProduct)
+                throw new AppError_1.AppError('Client ou application hors de votre périmètre', 403);
+        }
         const license = await licenseService_1.licenseService.createLicense(req.body, req.user, req);
         res.status(201).json({ success: true, data: license });
     }
@@ -82,6 +120,7 @@ async function createLicense(req, res, next) {
 }
 async function updateLicense(req, res, next) {
     try {
+        await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
         const license = await licenseService_1.licenseService.updateLicense((0, params_1.getParamId)(req.params), req.body, req.user, req);
         res.json({ success: true, data: license });
     }
@@ -91,6 +130,7 @@ async function updateLicense(req, res, next) {
 }
 async function suspendLicense(req, res, next) {
     try {
+        await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
         const license = await licenseService_1.licenseService.suspendLicense((0, params_1.getParamId)(req.params), req.user, req);
         res.json({ success: true, data: license });
     }
@@ -100,6 +140,7 @@ async function suspendLicense(req, res, next) {
 }
 async function reactivateLicense(req, res, next) {
     try {
+        await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
         const license = await licenseService_1.licenseService.reactivateLicense((0, params_1.getParamId)(req.params), req.user, req);
         res.json({ success: true, data: license });
     }
@@ -109,6 +150,7 @@ async function reactivateLicense(req, res, next) {
 }
 async function transferLicense(req, res, next) {
     try {
+        await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
         const { newMachineId } = req.body;
         const license = await licenseService_1.licenseService.transferLicense((0, params_1.getParamId)(req.params), newMachineId, req.user, req);
         res.json({ success: true, data: license });
@@ -119,6 +161,7 @@ async function transferLicense(req, res, next) {
 }
 async function getActivationLogs(req, res, next) {
     try {
+        await assertLicenseAccess(req, (0, params_1.getParamId)(req.params));
         const result = await licenseService_1.licenseService.getActivationLogs((0, params_1.getParamId)(req.params), Number(req.query.page) || 1, Number(req.query.limit) || 20);
         res.json({ success: true, data: result });
     }
@@ -128,6 +171,8 @@ async function getActivationLogs(req, res, next) {
 }
 async function listActivationRequests(req, res, next) {
     try {
+        if (req.user?.role === 'moderator')
+            throw new AppError_1.AppError('Accès non autorisé', 403);
         const { ActivationRequest } = await Promise.resolve().then(() => __importStar(require('../models')));
         const { status } = req.query;
         const filter = {};

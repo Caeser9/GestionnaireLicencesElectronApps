@@ -1,21 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
-import { Client } from '../models';
+import { Client, License } from '../models';
 import { AppError, assertFound } from '../utils/AppError';
 import { getParamId } from '../utils/params';
 import { createAuditLog } from '../middleware/audit';
 import { AuditAction, AuditResource } from '../types';
 
+async function tenantFilter(req: Request): Promise<Record<string, unknown>> {
+  if (req.user?.role !== 'moderator') return {};
+  if (!req.user.productId) throw new AppError('Ce compte modérateur doit être associé à une application', 403);
+  const clientsWithLicenses = await License.distinct('client', { product: req.user.productId });
+  return { $and: [{ $or: [
+    { platformProduct: req.user.productId },
+    { _id: { $in: clientsWithLicenses } },
+  ] }] };
+}
+
 export async function listClients(req: Request, res: Response, next: NextFunction) {
   try {
     const { page = '1', limit = '20', search } = req.query as Record<string, string>;
-    const filter: Record<string, unknown> = {};
+    const filter: Record<string, unknown> = await tenantFilter(req);
 
     if (search) {
-      filter.$or = [
+      const searchFilter = { $or: [
         { companyName: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
         { contactName: { $regex: search, $options: 'i' } },
-      ];
+      ] };
+      if (filter.$and) (filter.$and as Record<string, unknown>[]).push(searchFilter);
+      else Object.assign(filter, searchFilter);
     }
 
     const pageNum = parseInt(page, 10);
@@ -37,7 +49,7 @@ export async function listClients(req: Request, res: Response, next: NextFunctio
 
 export async function getClient(req: Request, res: Response, next: NextFunction) {
   try {
-    const client = assertFound(await Client.findById(getParamId(req.params)), 'Client non trouvé');
+    const client = assertFound(await Client.findOne({ _id: getParamId(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
     res.json({ success: true, data: client });
   } catch (error) {
     next(error);
@@ -46,7 +58,8 @@ export async function getClient(req: Request, res: Response, next: NextFunction)
 
 export async function createClient(req: Request, res: Response, next: NextFunction) {
   try {
-    const client = await Client.create({ ...req.body, createdBy: req.user!.userId });
+    const client = await Client.create({ ...req.body, createdBy: req.user!.userId,
+      ...(req.user!.role === 'moderator' ? { platformProduct: req.user!.productId } : {}) });
 
     await createAuditLog(req.user, {
       action: AuditAction.CREATE,
@@ -63,7 +76,7 @@ export async function createClient(req: Request, res: Response, next: NextFuncti
 
 export async function updateClient(req: Request, res: Response, next: NextFunction) {
   try {
-    const client = assertFound(await Client.findById(getParamId(req.params)), 'Client non trouvé');
+    const client = assertFound(await Client.findOne({ _id: getParamId(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
     Object.assign(client, req.body);
     await client.save();
 
@@ -83,7 +96,7 @@ export async function updateClient(req: Request, res: Response, next: NextFuncti
 
 export async function deleteClient(req: Request, res: Response, next: NextFunction) {
   try {
-    const client = assertFound(await Client.findById(getParamId(req.params)), 'Client non trouvé');
+    const client = assertFound(await Client.findOne({ _id: getParamId(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
     client.isActive = false;
     await client.save();
 
@@ -102,6 +115,7 @@ export async function deleteClient(req: Request, res: Response, next: NextFuncti
 
 export async function getClientHistory(req: Request, res: Response, next: NextFunction) {
   try {
+    const client = assertFound(await Client.findOne({ _id: getParamId(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
     const { AuditLog } = await import('../models');
     const logs = await AuditLog.find({
       resource: AuditResource.CLIENT,

@@ -3,8 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDashboardStats = getDashboardStats;
 exports.getAuditLogs = getAuditLogs;
 const statsService_1 = require("../services/statsService");
-async function getDashboardStats(_req, res, next) {
+const AppError_1 = require("../utils/AppError");
+async function getDashboardStats(req, res, next) {
     try {
+        if (req.user?.role === 'moderator')
+            throw new AppError_1.AppError('Statistiques globales non accessibles', 403);
         const stats = await statsService_1.statsService.getDashboardStats();
         res.json({ success: true, data: stats });
     }

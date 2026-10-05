@@ -16,18 +16,21 @@ export declare const createUserSchema: z.ZodObject<{
     firstName: z.ZodString;
     lastName: z.ZodString;
     role: z.ZodNativeEnum<typeof UserRole>;
+    productId: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
     role: UserRole;
+    productId?: string | undefined;
 }, {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
     role: UserRole;
+    productId?: string | undefined;
 }>;
 export declare const updateUserSchema: z.ZodObject<Omit<{
     email: z.ZodOptional<z.ZodString>;
@@ -35,6 +38,7 @@ export declare const updateUserSchema: z.ZodObject<Omit<{
     firstName: z.ZodOptional<z.ZodString>;
     lastName: z.ZodOptional<z.ZodString>;
     role: z.ZodOptional<z.ZodNativeEnum<typeof UserRole>>;
+    productId: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, "password"> & {
     password: z.ZodOptional<z.ZodString>;
     isActive: z.ZodOptional<z.ZodBoolean>;
@@ -44,6 +48,7 @@ export declare const updateUserSchema: z.ZodObject<Omit<{
     firstName?: string | undefined;
     lastName?: string | undefined;
     role?: UserRole | undefined;
+    productId?: string | undefined;
     isActive?: boolean | undefined;
 }, {
     email?: string | undefined;
@@ -51,6 +56,7 @@ export declare const updateUserSchema: z.ZodObject<Omit<{
     firstName?: string | undefined;
     lastName?: string | undefined;
     role?: UserRole | undefined;
+    productId?: string | undefined;
     isActive?: boolean | undefined;
 }>;
 export declare const createClientSchema: z.ZodObject<{
@@ -255,6 +261,7 @@ export declare const approveActivationSchema: z.ZodObject<{
     maxUsers: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     maxWorkstations: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     authorizedModules: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    dashboardMode: z.ZodOptional<z.ZodEnum<["pro", "simple"]>>;
     expiresAt: z.ZodEffects<z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNull, z.ZodLiteral<"">]>>, string | undefined, string | null | undefined>;
     adminNotes: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
@@ -263,6 +270,7 @@ export declare const approveActivationSchema: z.ZodObject<{
     maxUsers?: number | undefined;
     maxWorkstations?: number | undefined;
     authorizedModules?: string[] | undefined;
+    dashboardMode?: "pro" | "simple" | undefined;
     expiresAt?: string | undefined;
     adminNotes?: string | undefined;
 }, {
@@ -271,6 +279,7 @@ export declare const approveActivationSchema: z.ZodObject<{
     maxUsers?: unknown;
     maxWorkstations?: unknown;
     authorizedModules?: string[] | undefined;
+    dashboardMode?: "pro" | "simple" | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
 }>;
@@ -281,6 +290,7 @@ export declare const createLicenseSchema: z.ZodObject<{
     maxUsers: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     maxWorkstations: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     authorizedModules: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    dashboardMode: z.ZodOptional<z.ZodEnum<["pro", "simple"]>>;
     minVersion: z.ZodOptional<z.ZodString>;
     maxVersion: z.ZodOptional<z.ZodString>;
     expiresAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -292,6 +302,7 @@ export declare const createLicenseSchema: z.ZodObject<{
     maxUsers?: number | undefined;
     maxWorkstations?: number | undefined;
     authorizedModules?: string[] | undefined;
+    dashboardMode?: "pro" | "simple" | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
     minVersion?: string | undefined;
@@ -303,6 +314,7 @@ export declare const createLicenseSchema: z.ZodObject<{
     maxUsers?: unknown;
     maxWorkstations?: unknown;
     authorizedModules?: string[] | undefined;
+    dashboardMode?: "pro" | "simple" | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
     minVersion?: string | undefined;
@@ -314,6 +326,7 @@ export declare const updateLicenseSchema: z.ZodObject<{
     maxUsers: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     maxWorkstations: z.ZodEffects<z.ZodOptional<z.ZodNumber>, number | undefined, unknown>;
     authorizedModules: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    dashboardMode: z.ZodOptional<z.ZodEnum<["pro", "simple"]>>;
     minVersion: z.ZodOptional<z.ZodString>;
     maxVersion: z.ZodOptional<z.ZodString>;
     expiresAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -323,6 +336,7 @@ export declare const updateLicenseSchema: z.ZodObject<{
     maxUsers?: number | undefined;
     maxWorkstations?: number | undefined;
     authorizedModules?: string[] | undefined;
+    dashboardMode?: "pro" | "simple" | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
     licenseType?: string | undefined;
@@ -333,6 +347,7 @@ export declare const updateLicenseSchema: z.ZodObject<{
     maxUsers?: unknown;
     maxWorkstations?: unknown;
     authorizedModules?: string[] | undefined;
+    dashboardMode?: "pro" | "simple" | undefined;
     expiresAt?: string | null | undefined;
     adminNotes?: string | undefined;
     licenseType?: string | undefined;

@@ -15,6 +15,7 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   [UserRole.SUPER_ADMIN]: 3,
   [UserRole.ADMIN]: 2,
   [UserRole.SUPPORT]: 1,
+  [UserRole.MODERATOR]: 1,
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

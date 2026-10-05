@@ -2,6 +2,7 @@ export enum UserRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
   SUPPORT = 'support',
+  MODERATOR = 'moderator',
 }
 
 export enum LicenseStatus {
@@ -47,6 +48,7 @@ export interface JwtPayload {
   userId: string;
   email: string;
   role: UserRole;
+  productId?: string;
 }
 
 export interface SignedLicensePayload {

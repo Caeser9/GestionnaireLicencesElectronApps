@@ -13,6 +13,7 @@ exports.createUserSchema = zod_1.z.object({
     firstName: zod_1.z.string().min(1),
     lastName: zod_1.z.string().min(1),
     role: zod_1.z.nativeEnum(types_1.UserRole),
+    productId: zod_1.z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
 });
 exports.updateUserSchema = exports.createUserSchema.partial().omit({ password: true }).extend({
     password: zod_1.z.string().min(8).optional(),
@@ -78,6 +79,7 @@ exports.approveActivationSchema = zod_1.z.object({
     maxUsers: optionalPositiveInt,
     maxWorkstations: optionalPositiveInt,
     authorizedModules: zod_1.z.array(zod_1.z.string()).optional(),
+    dashboardMode: zod_1.z.enum(['pro', 'simple']).optional(),
     expiresAt: zod_1.z.union([zod_1.z.string().datetime(), zod_1.z.null(), zod_1.z.literal('')]).optional().transform((v) => v || undefined),
     adminNotes: zod_1.z.string().optional(),
 });
@@ -88,6 +90,7 @@ exports.createLicenseSchema = zod_1.z.object({
     maxUsers: optionalPositiveInt,
     maxWorkstations: optionalPositiveInt,
     authorizedModules: zod_1.z.array(zod_1.z.string()).optional(),
+    dashboardMode: zod_1.z.enum(['pro', 'simple']).optional(),
     minVersion: zod_1.z.string().optional(),
     maxVersion: zod_1.z.string().optional(),
     expiresAt: zod_1.z.string().datetime().optional().nullable(),
@@ -99,6 +102,7 @@ exports.updateLicenseSchema = zod_1.z.object({
     maxUsers: optionalPositiveInt,
     maxWorkstations: optionalPositiveInt,
     authorizedModules: zod_1.z.array(zod_1.z.string()).optional(),
+    dashboardMode: zod_1.z.enum(['pro', 'simple']).optional(),
     minVersion: zod_1.z.string().optional(),
     maxVersion: zod_1.z.string().optional(),
     expiresAt: zod_1.z.string().datetime().optional().nullable(),

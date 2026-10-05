@@ -60,6 +60,7 @@ Le dashboard est accessible sur `http://localhost:5173`
 
 ### Dashboard d'administration
 - Authentification JWT avec rôles (Super Admin, Admin, Support)
+- Comptes modérateurs associés à une plateforme cliente et à une application, limités aux licences de cette application pour leurs clients
 - Gestion des clients, produits, modules, types de licence
 - Création et gestion des licences (suspendre, réactiver, transférer)
 - Validation des demandes d'activation

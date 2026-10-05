@@ -44,16 +44,31 @@ const AppError_1 = require("../utils/AppError");
 const params_1 = require("../utils/params");
 const audit_1 = require("../middleware/audit");
 const types_1 = require("../types");
+async function tenantFilter(req) {
+    if (req.user?.role !== 'moderator')
+        return {};
+    if (!req.user.productId)
+        throw new AppError_1.AppError('Ce compte modérateur doit être associé à une application', 403);
+    const clientsWithLicenses = await models_1.License.distinct('client', { product: req.user.productId });
+    return { $and: [{ $or: [
+                    { platformProduct: req.user.productId },
+                    { _id: { $in: clientsWithLicenses } },
+                ] }] };
+}
 async function listClients(req, res, next) {
     try {
         const { page = '1', limit = '20', search } = req.query;
-        const filter = {};
+        const filter = await tenantFilter(req);
         if (search) {
-            filter.$or = [
-                { companyName: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { contactName: { $regex: search, $options: 'i' } },
-            ];
+            const searchFilter = { $or: [
+                    { companyName: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { contactName: { $regex: search, $options: 'i' } },
+                ] };
+            if (filter.$and)
+                filter.$and.push(searchFilter);
+            else
+                Object.assign(filter, searchFilter);
         }
         const pageNum = parseInt(page, 10);
         const limitNum = parseInt(limit, 10);
@@ -72,7 +87,7 @@ async function listClients(req, res, next) {
 }
 async function getClient(req, res, next) {
     try {
-        const client = (0, AppError_1.assertFound)(await models_1.Client.findById((0, params_1.getParamId)(req.params)), 'Client non trouvé');
+        const client = (0, AppError_1.assertFound)(await models_1.Client.findOne({ _id: (0, params_1.getParamId)(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
         res.json({ success: true, data: client });
     }
     catch (error) {
@@ -81,7 +96,8 @@ async function getClient(req, res, next) {
 }
 async function createClient(req, res, next) {
     try {
-        const client = await models_1.Client.create({ ...req.body, createdBy: req.user.userId });
+        const client = await models_1.Client.create({ ...req.body, createdBy: req.user.userId,
+            ...(req.user.role === 'moderator' ? { platformProduct: req.user.productId } : {}) });
         await (0, audit_1.createAuditLog)(req.user, {
             action: types_1.AuditAction.CREATE,
             resource: types_1.AuditResource.CLIENT,
@@ -96,7 +112,7 @@ async function createClient(req, res, next) {
 }
 async function updateClient(req, res, next) {
     try {
-        const client = (0, AppError_1.assertFound)(await models_1.Client.findById((0, params_1.getParamId)(req.params)), 'Client non trouvé');
+        const client = (0, AppError_1.assertFound)(await models_1.Client.findOne({ _id: (0, params_1.getParamId)(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
         Object.assign(client, req.body);
         await client.save();
         await (0, audit_1.createAuditLog)(req.user, {
@@ -114,7 +130,7 @@ async function updateClient(req, res, next) {
 }
 async function deleteClient(req, res, next) {
     try {
-        const client = (0, AppError_1.assertFound)(await models_1.Client.findById((0, params_1.getParamId)(req.params)), 'Client non trouvé');
+        const client = (0, AppError_1.assertFound)(await models_1.Client.findOne({ _id: (0, params_1.getParamId)(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
         client.isActive = false;
         await client.save();
         await (0, audit_1.createAuditLog)(req.user, {
@@ -131,6 +147,7 @@ async function deleteClient(req, res, next) {
 }
 async function getClientHistory(req, res, next) {
     try {
+        const client = (0, AppError_1.assertFound)(await models_1.Client.findOne({ _id: (0, params_1.getParamId)(req.params), ...await tenantFilter(req) }), 'Client non trouvé');
         const { AuditLog } = await Promise.resolve().then(() => __importStar(require('../models')));
         const logs = await AuditLog.find({
             resource: types_1.AuditResource.CLIENT,

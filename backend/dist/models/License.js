@@ -52,6 +52,7 @@ const licenseSchema = new mongoose_1.Schema({
     maxUsers: { type: Number, required: true, min: 1 },
     maxWorkstations: { type: Number, required: true, min: 1 },
     authorizedModules: [{ type: String }],
+    dashboardMode: { type: String, enum: ['pro', 'simple'] },
     minVersion: { type: String },
     maxVersion: { type: String },
     machineId: { type: String },

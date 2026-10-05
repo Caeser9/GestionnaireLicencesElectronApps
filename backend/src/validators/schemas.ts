@@ -12,6 +12,7 @@ export const createUserSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   role: z.nativeEnum(UserRole),
+  productId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
 });
 
 export const updateUserSchema = createUserSchema.partial().omit({ password: true }).extend({

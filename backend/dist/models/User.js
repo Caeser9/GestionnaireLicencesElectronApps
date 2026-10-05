@@ -50,6 +50,7 @@ const userSchema = new mongoose_1.Schema({
         enum: Object.values(types_1.UserRole),
         default: types_1.UserRole.SUPPORT,
     },
+    productId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product', index: true },
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
 }, { timestamps: true });

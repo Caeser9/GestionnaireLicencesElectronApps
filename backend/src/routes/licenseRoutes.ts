@@ -16,15 +16,15 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get('/', authorize(UserRole.SUPPORT), licenseController.listLicenses);
+router.get('/', authorize(UserRole.SUPPORT, UserRole.MODERATOR), licenseController.listLicenses);
 router.get('/activations', authorize(UserRole.SUPPORT), licenseController.listActivationRequests);
-router.get('/:id', authorize(UserRole.SUPPORT), validateParams(mongoIdSchema), licenseController.getLicense);
-router.get('/:id/logs', authorize(UserRole.SUPPORT), validateParams(mongoIdSchema), licenseController.getActivationLogs);
-router.post('/', authorize(UserRole.ADMIN), normalizeLicenseNumericFields, validateBody(createLicenseSchema), licenseController.createLicense);
-router.put('/:id', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), normalizeLicenseNumericFields, validateBody(updateLicenseSchema), licenseController.updateLicense);
-router.post('/:id/suspend', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), licenseController.suspendLicense);
-router.post('/:id/reactivate', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), licenseController.reactivateLicense);
-router.post('/:id/transfer', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), licenseController.transferLicense);
+router.get('/:id', authorize(UserRole.SUPPORT, UserRole.MODERATOR), validateParams(mongoIdSchema), licenseController.getLicense);
+router.get('/:id/logs', authorize(UserRole.SUPPORT, UserRole.MODERATOR), validateParams(mongoIdSchema), licenseController.getActivationLogs);
+router.post('/', authorize(UserRole.ADMIN, UserRole.MODERATOR), normalizeLicenseNumericFields, validateBody(createLicenseSchema), licenseController.createLicense);
+router.put('/:id', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateParams(mongoIdSchema), normalizeLicenseNumericFields, validateBody(updateLicenseSchema), licenseController.updateLicense);
+router.post('/:id/suspend', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateParams(mongoIdSchema), licenseController.suspendLicense);
+router.post('/:id/reactivate', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateParams(mongoIdSchema), licenseController.reactivateLicense);
+router.post('/:id/transfer', authorize(UserRole.ADMIN, UserRole.MODERATOR), validateParams(mongoIdSchema), licenseController.transferLicense);
 router.post('/activations/:id/approve', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), normalizeLicenseNumericFields, validateBody(approveActivationSchema), licenseController.approveActivation);
 router.post('/activations/:id/reject', authorize(UserRole.ADMIN), validateParams(mongoIdSchema), validateBody(rejectActivationSchema), licenseController.rejectActivation);
 

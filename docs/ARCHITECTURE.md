@@ -84,6 +84,8 @@ backend/src/
 | Journal d'audit | | ✓ | ✓ |
 | Gérer utilisateurs | | | ✓ |
 
+Le rôle **Modérateur client** est associé à une application (`User.productId`). Les clients qu'il crée sont rattachés à cette application (`Client.platformProduct`) ; ses listes et opérations sur les licences sont limitées à cette application. Un Super Admin crée ce compte depuis la page Utilisateurs.
+
 ## Extensibilité multi-produits
 
 Chaque produit possède un `slug` unique. Les licences, modules et versions sont liés à un produit spécifique. Ajouter un nouveau logiciel commercial ne nécessite aucune modification de l'architecture — il suffit de créer un nouveau produit dans le Dashboard.

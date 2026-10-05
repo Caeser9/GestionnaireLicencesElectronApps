@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { authApi } from '../api/services';
+import { authApi, catalogApi } from '../api/services';
 import { PageHeader, DataTable, Modal, LoadingSpinner } from '../components/ui';
 import { User, ROLE_LABELS } from '../types';
 
@@ -12,6 +12,10 @@ export default function UsersPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: () => authApi.listUsers().then((r) => r.data.data as User[]),
+  });
+  const { data: productsResponse } = useQuery({
+    queryKey: ['products', 'moderator-applications'],
+    queryFn: () => catalogApi.products.list().then((r) => r.data.data.items),
   });
 
   const createMutation = useMutation({
@@ -57,7 +61,9 @@ export default function UsersPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            createMutation.mutate(Object.fromEntries(new FormData(e.currentTarget).entries()));
+            const values = Object.fromEntries(new FormData(e.currentTarget).entries());
+            if (!values.productId) delete values.productId;
+            createMutation.mutate(values);
           }}
           className="space-y-4"
         >
@@ -81,11 +87,26 @@ export default function UsersPage() {
           </div>
           <div>
             <label className="label">Rôle *</label>
-            <select name="role" className="input" required>
+            <select name="role" className="input" required onChange={(e) => {
+              const associationField = document.getElementById('moderator-association-field');
+              const associationSelects = associationField?.querySelectorAll('select');
+              if (associationField) associationField.classList.toggle('hidden', e.target.value !== 'moderator');
+              associationSelects?.forEach((select) => { select.required = e.target.value === 'moderator'; });
+            }}>
               {Object.entries(ROLE_LABELS).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
               ))}
             </select>
+          </div>
+          <div id="moderator-association-field" className="hidden space-y-4">
+            <label className="label">Application gérée *</label>
+            <select name="productId" className="input">
+              <option value="">Sélectionner une application</option>
+              {(productsResponse ?? []).filter((product: { isActive: boolean }) => product.isActive).map((product: { _id: string; name: string }) => (
+                <option key={product._id} value={product._id}>{product.name}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500">Le modérateur verra les clients et licences de cette application uniquement.</p>
           </div>
           <div className="flex justify-end gap-3">
             <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Annuler</button>
