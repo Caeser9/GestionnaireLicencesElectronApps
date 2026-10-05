@@ -51,7 +51,10 @@ export default function LicensesPage() {
   const [editingLicense, setEditingLicense] = useState<License | null>(null);
   const [editForm, setEditForm] = useState<EditFormState | null>(null);
   const queryClient = useQueryClient();
-  const { hasRole } = useAuth();
+  const { user } = useAuth();
+  const canManageLicenses = user?.role === UserRole.MODERATOR
+    || user?.role === UserRole.ADMIN
+    || user?.role === UserRole.SUPER_ADMIN;
 
   const { data, isLoading } = useQuery({
     queryKey: ['licenses', statusFilter],
@@ -209,7 +212,7 @@ export default function LicensesPage() {
       label: 'Actions',
       render: (_: unknown, row: Record<string, unknown>) => {
         const license = row as unknown as License;
-        if (!hasRole(UserRole.MODERATOR)) return null;
+        if (!canManageLicenses) return null;
         return (
           <div className="flex gap-2">
             <button
@@ -258,7 +261,7 @@ export default function LicensesPage() {
         title="Licences"
         description="Gestion des licences logicielles"
         actions={
-          hasRole(UserRole.MODERATOR) && (
+          canManageLicenses && (
             <button className="btn-primary" onClick={() => setShowModal(true)}>
               <Plus className="h-4 w-4" /> Nouvelle licence
             </button>
